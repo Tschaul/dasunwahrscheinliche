@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width">
+    <title>Generator-Funktionen in JavaScript - Das Unwahrscheinliche
+    </title>
+    <link rel="alternate" href="http://localhost:8080/feed.xml" type="application/rss+xml" title="von Julian Steinwachs">
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic|Anonymous+Pro:400,700,400italic,700italic|Merriweather:400,700,300">
+    <link rel="stylesheet" href="/css/main.css">
+  </head>
+  <body class="article-detail">
+    <header class="header">
+      <div class="content-wrap">
+        <h1>Generator-Funktionen in JavaScript</h1>
+        <p class="author">Von <span class="author">Julian Steinwachs</span>
+        </p>
+      </div>
+    </header>
+    <div id="content">
+      <div class="content-wrap">
+        <article class="article">
+          <section class="content"><p>Vielleicht hat der ein oder anderen schon einmal bemerkt, dass einige Supermarktkassen den Kassenbon bereits während des Scannvorgangs der Waren drucken. Das macht eine Menge Sinn und reduziert gerade bei größeren Einkäufen die Wartezeit beim Bezahlvorgang&nbsp;erheblich.</p>
+<p>Nun ist diese häppchenweise Verarbeitung der Eingaben sicher ein schickes Feature, aber es erhöht die technische Komplexität. Generator-Funktionen sind eine Abstraktion um diese Komplexitätserhöhung einzugrenzen, indem sie es erlauben Iterationen von außerhalb zu&nbsp;steuern.</p>
+<p><span class="more"></span></p>
+<p>In JavaScript kamen Generator-Funktionen mit dem ECMAScript-2015-Standard (<span class="caps">ES6</span>) dazu. Sie werden mit einem Asterisk-Symbol nach dem <code>function</code>-Keyword gekennzeichnet. Ruft man eine solche Funktion auf erhält man nicht direkt einen Wert, sondern ein Generator-Objekt, welches die Erzeugung neuer Werte steuert. Durch den Aufruf von <code>next()</code> erhält man ein Objekt mit dem nächsten Wert und der Information ob die Iteration abgeschlossen&nbsp;ist.</p>
+<pre><code class="lang-javascript"><span class="function"><span class="keyword">function</span>* <span class="title">oneToThree</span>(<span class="params"></span>) </span>{
+  <span class="keyword">yield</span> <span class="number">1</span>
+  <span class="keyword">yield</span> <span class="number">2</span>
+  <span class="keyword">return</span> <span class="number">3</span>
+}
+
+<span class="keyword">var</span> gen = oneToThree();
+
+<span class="built_in">console</span>.log(gen.next()); <span class="comment">// { value: 1, done: false }</span>
+<span class="built_in">console</span>.log(gen.next()); <span class="comment">// { value: 2, done: false }</span>
+<span class="built_in">console</span>.log(gen.next()); <span class="comment">// { value: 3, done: true }</span>
+</code></pre>
+<p>Das erhaltene Generator-Objekt kann auch als Iterator verwendet werden. Dadurch lässt sich über die Ergebnisse auch mittels <code>for ... of</code> iterieren:</p>
+<pre><code class="lang-javascript"><span class="keyword">for</span> (<span class="keyword">var</span> num <span class="keyword">of</span> oneToThree()){
+    <span class="built_in">console</span>.log(num)
+}
+<span class="comment">// 1</span>
+<span class="comment">// 2</span>
+<span class="comment">// 3</span>
+</code></pre>
+<p>Für unser Eingangsbeispiel der Supermarktkasse sind wir jetzt aber nur einen kleinen Schritt weiter. Denn dort sollen in der gesteuerten Schleife keine Werte erzeugt werden wie oben, sondern die Werte sollen in der Schleife Eingabe für Eingabe verarbeitet werden. In diesem benutzt man das Generator-Objekt als Observer. Ein Generator ist schlicht die Vereinigung von Iterator und&nbsp;Observer. </p>
+<pre><code class="lang-javascript"><span class="function"><span class="keyword">function</span>* <span class="title">logSomeStuff</span>(<span class="params"></span>)</span>{
+    While(<span class="literal">true</span>){
+        nextInput = <span class="keyword">yield</span>;
+        <span class="built_in">console</span>.log(nextInput);
+    }
+}
+<span class="keyword">var</span> gen = logSomeStuff();
+gen.next(<span class="string">"foo"</span>) <span class="comment">// foo</span>
+gen.next(<span class="string">"bar"</span>) <span class="comment">// bar</span>
+</code></pre>
+<p>Hier wird das Schlüsselwort <code>yield</code> als Ausdruck benutzt und nicht als Statement. Die Auswertung des Ausdrucks hat den Effekt, dass die Funktion an dieser Stelle gestoppt wird bis der Observer mittels <code>next(...)</code> mit einem neuen Wert gefüttert wird. Dann wird der neue Wert an Stelle des <code>yield</code>-Ausdrucks gestellt und die Funktion läuft&nbsp;weiter.</p>
+<p>Mit diesem letzten Beispiel haben wir bereits den eingangs erwähnten Anwendungsfall des Supermarktkassen-Druckers erschlagen. Generator-Funktionen haben aber noch weit mehr zu bieten. Insbesondere für die asynchrone Programmierung sind Generatpr-Funktionen ein mächtiges Werkzeug, wie wir weiter unten sehen&nbsp;werden.</p>
+<p>Man kann nämlich auch beide Aspekte des Generators (Observer und Iterator) kombinieren um bei jeder Iteration ein Teilergebnis zurückzugeben. Hier tritt aber die sprachliche Obskurität auf, dass <code>yield</code> sowohl als Statement als auch als Ausdruck verwendet wird. Dabei gilt, dass erst das <code>yield</code>-Statement ausgeführt wird, also ein Wert für die Iteration generiert wird, und anschließend das <code>yield</code>-Statement durch den Wert ersetzt wird mit dem der Generator gefüttert wurde. Folgendes Beispiel stellt einen Generator dar, der zurückgibt ob der zuletzt gefütterte Werte größer ist als der&nbsp;vorletzte.</p>
+<pre><code class="lang-javascript"><span class="function"><span class="keyword">function</span>* <span class="title">goingUp</span>(<span class="params"></span>)</span>{
+    <span class="keyword">var</span> old = <span class="keyword">yield</span>;
+    <span class="keyword">var</span> now = <span class="keyword">yield</span>;
+    <span class="keyword">while</span>(<span class="literal">true</span>){
+        <span class="keyword">var</span> now = <span class="keyword">yield</span> now &gt; old;
+        old = now;
+    }
+}
+
+<span class="keyword">var</span> gen = goingUp();
+<span class="built_in">console</span>.log(gen.next(<span class="number">0</span>).value)  <span class="comment">// undefined </span>
+<span class="built_in">console</span>.log(gen.next(<span class="number">2</span>).value)  <span class="comment">// undefined</span>
+<span class="built_in">console</span>.log(gen.next(<span class="number">1</span>).value)  <span class="comment">// true // 2 &gt; 0</span>
+<span class="built_in">console</span>.log(gen.next(<span class="number">0</span>).value)  <span class="comment">// false // 1 &lt; 2</span>
+</code></pre>
+<p>Eine solcher Generator kann z.B. benutzt werden um das erste lokale Maximum einer Zahlenreihe zu finden, ohne dass der Konsument der Funktion alle Werte zur Verfügung stellen muss. Das kann nützlich sein, wenn z.B. die Werte einzeln oder Batch-weise aus einer Datenbank gelesen werden&nbsp;müssen.</p>
+<p>Die doppelte Natur von Generator-Funktionen lässt sich außerdem ausnutzen um asynchronen JavaScript-Code leichter lesbar zu gestalten. Dazu schreiben wir uns eine wiederverwendbare Funktion <code>runAsync</code> die als einzigen Parameter eine Generator-Funktion erwartet, welche Promise-Objekte zurückgibt. Promises sind Stellvertreter-Objekte für zukünftige Rückgabewerte und entsprechen etwa Futures in Java/C++ oder Tasks in c#. Die <code>runAsync</code>-Funktion nimmt die Promises entgegen und füttert asynchron nach deren Auflösung das Ergebnis zurück in den Generator. Zwecks der Kürze ist in folgendem Beispiel die Fehlerbehandlung absichtlich&nbsp;ausgelassen.</p>
+<pre><code class="lang-javascript"><span class="function"><span class="keyword">function</span> <span class="title">runAsync</span>(<span class="params">generator</span>)</span>{
+    <span class="keyword">var</span> it = generator();
+    (<span class="function"><span class="keyword">function</span> <span class="title">iterate</span>(<span class="params">val</span>)</span>{
+        <span class="keyword">var</span> ret = it.next( val );
+        <span class="keyword">if</span> (!ret.done) {
+            ret.value.then( iterate );
+        }
+    })();
+}
+</code></pre>
+<p>Dadurch können wir nun eine asynchrone Funktion so schreiben als wäre sie synchron. Im Folgenden geben die Funktionen <code>getFoo</code> und <code>getBar</code> asynchron die Strings “foo” und “bar”&nbsp;zurück.</p>
+<pre><code class="lang-javascript"><span class="function"><span class="keyword">function</span>* <span class="title">printFooBar</span>(<span class="params"></span>)</span>{
+    <span class="keyword">var</span> part1 = <span class="keyword">yield</span> getFoo()
+    <span class="keyword">var</span> part2 = <span class="keyword">yield</span> getBar()
+    <span class="built_in">console</span>.log(part1+part2)
+}
+
+runAsync(printFooBar) <span class="comment">// foobar</span>
+</code></pre>
+<p>Nach der Auflösung des von <code>getFoo</code> erhaltenen Promise-Objekts wird das <code>yield</code>-Statement “<code>yield getFoo()</code>“ durch den String “foo” ersetzt und der Variable <code>part1</code> zugewiesen. Erst danach wird mit <code>getBar</code> das nächste Promise-Objekt&nbsp;angefordert.</p>
+<p>Im neueren ECMAScript-2016-Standard (<span class="caps">ES7</span>), welcher noch im Draft-Zustand ist, erhält dieser spezielle Anwendungsfall für Generator-Funktionen mit <code>async/await</code> seine eigene Syntax. Dadurch braucht man keine eigene <code>runAsync</code>-Funktion&nbsp;mehr.</p>
+<pre><code class="lang-javascript"><span class="keyword">async</span> <span class="function"><span class="keyword">function</span> <span class="title">printFooBar</span>(<span class="params"></span>)</span>{
+    <span class="keyword">var</span> part1 = <span class="keyword">await</span> getFoo()
+    <span class="keyword">var</span> part2 = <span class="keyword">await</span> getBar()
+    <span class="built_in">console</span>.log(part1+part2)
+}
+
+printFooBar() <span class="comment">// foobar</span>
+</code></pre>
+<p>Unter der Haube läuft in beiden Fällen genau das selbe ab. Bis zur Finalisierung von <span class="caps">ES7</span> lässt sich diese Funktionalität aber ebenfalls wie gezeigt erzielen. Für den produktiven Einsatz empfehle ich die Library “co” (<a href="https://github.com/tj/co">https://github.com/tj/co</a>).</p>
+<h3 id="referenzen-">Referenzen:</h3>
+<p><a href="https://www.youtube.com/watch?v=_8Qyk5j_b-g">https://www.youtube.com/watch?v=_8Qyk5j_b-g</a></p>
+<p><a href="https://davidwalsh.name/es6-generators">https://davidwalsh.name/es6-generators</a></p>
+</section>
+        </article>
+      </div>
+    </div>
+    <footer>
+      <div class="content-wrap">
+        <div class="nav"><a href="/">&laquo; Full blog</a></div>
+        <section class="about"><p>Kontakt:
+Julian Steinwachs
+Raumerstr. 2
+91054 Erlangen</p>
+<p>Kommentare und Verbesserungen gerne via <a href="https://github.com/tschaul/dasunwahrscheinliche">github</a>.</p>
+<p>Lizensiert unter CC-BY-SA</p>
+
+        </section>
+        <section class="copy">
+          <p>&copy; 2017 Julian Steinwachs &mdash; powered by&nbsp;<a href="https://github.com/jnordberg/wintersmith">Wintersmith</a>
+          </p>
+        </section>
+      </div>
+    </footer>
+  </body>
+</html>

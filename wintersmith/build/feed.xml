@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:wfw="http://wellformedweb.org/CommentAPI/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Das Unwahrscheinliche</title>
+    <atom:link href="http://localhost:8080/feed.xml" rel="self" type="application/rss+xml"></atom:link>
+    <link>http://localhost:8080</link>
+    <description>von Julian Steinwachs</description>
+    <pubDate>Thu, 15 Jun 2017 02:00:00 +0200</pubDate>
+    <generator>Wintersmith - https://github.com/jnordberg/wintersmith</generator>
+    <language>en</language>
+    <item>
+      <title>Generator-Funktionen in JavaScript</title>
+      <link>http://localhost:8080/articles/js_generators/</link>
+      <pubDate>Thu, 15 Jun 2017 02:00:00 +0200</pubDate>
+      <guid isPermaLink="true">http://localhost:8080/articles/js_generators/</guid>
+      <author></author>
+      <description>&lt;p&gt;Vielleicht hat der ein oder anderen schon einmal bemerkt, dass einige Supermarktkassen den Kassenbon bereits während des Scannvorgangs der Waren drucken. Das macht eine Menge Sinn und reduziert gerade bei größeren Einkäufen die Wartezeit beim Bezahlvorgang erheblich.&lt;/p&gt;
+&lt;p&gt;Nun ist diese häppchenweise Verarbeitung der Eingaben sicher ein schickes Feature, aber es erhöht die technische Komplexität. Generator-Funktionen sind eine Abstraktion um diese Komplexitätserhöhung einzugrenzen, indem sie es erlauben Iterationen von außerhalb zu steuern.&lt;/p&gt;
+&lt;p&gt;&lt;span class=&quot;more&quot;&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;In JavaScript kamen Generator-Funktionen mit dem ECMAScript-2015-Standard (ES6) dazu. Sie werden mit einem Asterisk-Symbol nach dem &lt;code&gt;function&lt;/code&gt;-Keyword gekennzeichnet. Ruft man eine solche Funktion auf erhält man nicht direkt einen Wert, sondern ein Generator-Objekt, welches die Erzeugung neuer Werte steuert. Durch den Aufruf von &lt;code&gt;next()&lt;/code&gt; erhält man ein Objekt mit dem nächsten Wert und der Information ob die Iteration abgeschlossen ist.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;lang-javascript&quot;&gt;&lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;function&lt;/span&gt;* &lt;span class=&quot;title&quot;&gt;oneToThree&lt;/span&gt;(&lt;span class=&quot;params&quot;&gt;&lt;/span&gt;) &lt;/span&gt;{
+  &lt;span class=&quot;keyword&quot;&gt;yield&lt;/span&gt; &lt;span class=&quot;number&quot;&gt;1&lt;/span&gt;
+  &lt;span class=&quot;keyword&quot;&gt;yield&lt;/span&gt; &lt;span class=&quot;number&quot;&gt;2&lt;/span&gt;
+  &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;number&quot;&gt;3&lt;/span&gt;
+}
+
+&lt;span class=&quot;keyword&quot;&gt;var&lt;/span&gt; gen = oneToThree();
+
+&lt;span class=&quot;built_in&quot;&gt;console&lt;/span&gt;.log(gen.next()); &lt;span class=&quot;comment&quot;&gt;// { value: 1, done: false }&lt;/span&gt;
+&lt;span class=&quot;built_in&quot;&gt;console&lt;/span&gt;.log(gen.next()); &lt;span class=&quot;comment&quot;&gt;// { value: 2, done: false }&lt;/span&gt;
+&lt;span class=&quot;built_in&quot;&gt;console&lt;/span&gt;.log(gen.next()); &lt;span class=&quot;comment&quot;&gt;// { value: 3, done: true }&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Das erhaltene Generator-Objekt kann auch als Iterator verwendet werden. Dadurch lässt sich über die Ergebnisse auch mittels &lt;code&gt;for ... of&lt;/code&gt; iterieren:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;lang-javascript&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;for&lt;/span&gt; (&lt;span class=&quot;keyword&quot;&gt;var&lt;/span&gt; num &lt;span class=&quot;keyword&quot;&gt;of&lt;/span&gt; oneToThree()){
+    &lt;span class=&quot;built_in&quot;&gt;console&lt;/span&gt;.log(num)
+}
+&lt;span class=&quot;comment&quot;&gt;// 1&lt;/span&gt;
+&lt;span class=&quot;comment&quot;&gt;// 2&lt;/span&gt;
+&lt;span class=&quot;comment&quot;&gt;// 3&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Für unser Eingangsbeispiel der Supermarktkasse sind wir jetzt aber nur einen kleinen Schritt weiter. Denn dort sollen in der gesteuerten Schleife keine Werte erzeugt werden wie oben, sondern die Werte sollen in der Schleife Eingabe für Eingabe verarbeitet werden. In diesem benutzt man das Generator-Objekt als Observer. Ein Generator ist schlicht die Vereinigung von Iterator und Observer. &lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;lang-javascript&quot;&gt;&lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;function&lt;/span&gt;* &lt;span class=&quot;title&quot;&gt;logSomeStuff&lt;/span&gt;(&lt;span class=&quot;params&quot;&gt;&lt;/span&gt;)&lt;/span&gt;{
+    While(&lt;span class=&quot;literal&quot;&gt;true&lt;/span&gt;){
+        nextInput = &lt;span class=&quot;keyword&quot;&gt;yield&lt;/span&gt;;
+        &lt;span class=&quot;built_in&quot;&gt;console&lt;/span&gt;.log(nextInput);
+    }
+}
+&lt;span class=&quot;keyword&quot;&gt;var&lt;/span&gt; gen = logSomeStuff();
+gen.next(&lt;span class=&quot;string&quot;&gt;&quot;foo&quot;&lt;/span&gt;) &lt;span class=&quot;comment&quot;&gt;// foo&lt;/span&gt;
+gen.next(&lt;span class=&quot;string&quot;&gt;&quot;bar&quot;&lt;/span&gt;) &lt;span class=&quot;comment&quot;&gt;// bar&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Hier wird das Schlüsselwort &lt;code&gt;yield&lt;/code&gt; als Ausdruck benutzt und nicht als Statement. Die Auswertung des Ausdrucks hat den Effekt, dass die Funktion an dieser Stelle gestoppt wird bis der Observer mittels &lt;code&gt;next(...)&lt;/code&gt; mit einem neuen Wert gefüttert wird. Dann wird der neue Wert an Stelle des &lt;code&gt;yield&lt;/code&gt;-Ausdrucks gestellt und die Funktion läuft weiter.&lt;/p&gt;
+&lt;p&gt;Mit diesem letzten Beispiel haben wir bereits den eingangs erwähnten Anwendungsfall des Supermarktkassen-Druckers erschlagen. Generator-Funktionen haben aber noch weit mehr zu bieten. Insbesondere für die asynchrone Programmierung sind Generatpr-Funktionen ein mächtiges Werkzeug, wie wir weiter unten sehen werden.&lt;/p&gt;
+&lt;p&gt;Man kann nämlich auch beide Aspekte des Generators (Observer und Iterator) kombinieren um bei jeder Iteration ein Teilergebnis zurückzugeben. Hier tritt aber die sprachliche Obskurität auf, dass &lt;code&gt;yield&lt;/code&gt; sowohl als Statement als auch als Ausdruck verwendet wird. Dabei gilt, dass erst das &lt;code&gt;yield&lt;/code&gt;-Statement ausgeführt wird, also ein Wert für die Iteration generiert wird, und anschließend das &lt;code&gt;yield&lt;/code&gt;-Statement durch den Wert ersetzt wird mit dem der Generator gefüttert wurde. Folgendes Beispiel stellt einen Generator dar, der zurückgibt ob der zuletzt gefütterte Werte größer ist als der vorletzte.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;lang-javascript&quot;&gt;&lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;function&lt;/span&gt;* &lt;span class=&quot;title&quot;&gt;goingUp&lt;/span&gt;(&lt;span class=&quot;params&quot;&gt;&lt;/span&gt;)&lt;/span&gt;{
+    &lt;span class=&quot;keyword&quot;&gt;var&lt;/span&gt; old = &lt;span class=&quot;keyword&quot;&gt;yield&lt;/span&gt;;
+    &lt;span class=&quot;keyword&quot;&gt;var&lt;/span&gt; now = &lt;span class=&quot;keyword&quot;&gt;yield&lt;/span&gt;;
+    &lt;span class=&quot;keyword&quot;&gt;while&lt;/span&gt;(&lt;span class=&quot;literal&quot;&gt;true&lt;/span&gt;){
+        &lt;span class=&quot;keyword&quot;&gt;var&lt;/span&gt; now = &lt;span class=&quot;keyword&quot;&gt;yield&lt;/span&gt; now &amp;gt; old;
+        old = now;
+    }
+}
+
+&lt;span class=&quot;keyword&quot;&gt;var&lt;/span&gt; gen = goingUp();
+&lt;span class=&quot;built_in&quot;&gt;console&lt;/span&gt;.log(gen.next(&lt;span class=&quot;number&quot;&gt;0&lt;/span&gt;).value)  &lt;span class=&quot;comment&quot;&gt;// undefined &lt;/span&gt;
+&lt;span class=&quot;built_in&quot;&gt;console&lt;/span&gt;.log(gen.next(&lt;span class=&quot;number&quot;&gt;2&lt;/span&gt;).value)  &lt;span class=&quot;comment&quot;&gt;// undefined&lt;/span&gt;
+&lt;span class=&quot;built_in&quot;&gt;console&lt;/span&gt;.log(gen.next(&lt;span class=&quot;number&quot;&gt;1&lt;/span&gt;).value)  &lt;span class=&quot;comment&quot;&gt;// true // 2 &amp;gt; 0&lt;/span&gt;
+&lt;span class=&quot;built_in&quot;&gt;console&lt;/span&gt;.log(gen.next(&lt;span class=&quot;number&quot;&gt;0&lt;/span&gt;).value)  &lt;span class=&quot;comment&quot;&gt;// false // 1 &amp;lt; 2&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Eine solcher Generator kann z.B. benutzt werden um das erste lokale Maximum einer Zahlenreihe zu finden, ohne dass der Konsument der Funktion alle Werte zur Verfügung stellen muss. Das kann nützlich sein, wenn z.B. die Werte einzeln oder Batch-weise aus einer Datenbank gelesen werden müssen.&lt;/p&gt;
+&lt;p&gt;Die doppelte Natur von Generator-Funktionen lässt sich außerdem ausnutzen um asynchronen JavaScript-Code leichter lesbar zu gestalten. Dazu schreiben wir uns eine wiederverwendbare Funktion &lt;code&gt;runAsync&lt;/code&gt; die als einzigen Parameter eine Generator-Funktion erwartet, welche Promise-Objekte zurückgibt. Promises sind Stellvertreter-Objekte für zukünftige Rückgabewerte und entsprechen etwa Futures in Java/C++ oder Tasks in c#. Die &lt;code&gt;runAsync&lt;/code&gt;-Funktion nimmt die Promises entgegen und füttert asynchron nach deren Auflösung das Ergebnis zurück in den Generator. Zwecks der Kürze ist in folgendem Beispiel die Fehlerbehandlung absichtlich ausgelassen.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;lang-javascript&quot;&gt;&lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;runAsync&lt;/span&gt;(&lt;span class=&quot;params&quot;&gt;generator&lt;/span&gt;)&lt;/span&gt;{
+    &lt;span class=&quot;keyword&quot;&gt;var&lt;/span&gt; it = generator();
+    (&lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;iterate&lt;/span&gt;(&lt;span class=&quot;params&quot;&gt;val&lt;/span&gt;)&lt;/span&gt;{
+        &lt;span class=&quot;keyword&quot;&gt;var&lt;/span&gt; ret = it.next( val );
+        &lt;span class=&quot;keyword&quot;&gt;if&lt;/span&gt; (!ret.done) {
+            ret.value.then( iterate );
+        }
+    })();
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Dadurch können wir nun eine asynchrone Funktion so schreiben als wäre sie synchron. Im Folgenden geben die Funktionen &lt;code&gt;getFoo&lt;/code&gt; und &lt;code&gt;getBar&lt;/code&gt; asynchron die Strings “foo” und “bar” zurück.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;lang-javascript&quot;&gt;&lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;function&lt;/span&gt;* &lt;span class=&quot;title&quot;&gt;printFooBar&lt;/span&gt;(&lt;span class=&quot;params&quot;&gt;&lt;/span&gt;)&lt;/span&gt;{
+    &lt;span class=&quot;keyword&quot;&gt;var&lt;/span&gt; part1 = &lt;span class=&quot;keyword&quot;&gt;yield&lt;/span&gt; getFoo()
+    &lt;span class=&quot;keyword&quot;&gt;var&lt;/span&gt; part2 = &lt;span class=&quot;keyword&quot;&gt;yield&lt;/span&gt; getBar()
+    &lt;span class=&quot;built_in&quot;&gt;console&lt;/span&gt;.log(part1+part2)
+}
+
+runAsync(printFooBar) &lt;span class=&quot;comment&quot;&gt;// foobar&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Nach der Auflösung des von &lt;code&gt;getFoo&lt;/code&gt; erhaltenen Promise-Objekts wird das &lt;code&gt;yield&lt;/code&gt;-Statement “&lt;code&gt;yield getFoo()&lt;/code&gt;“ durch den String “foo” ersetzt und der Variable &lt;code&gt;part1&lt;/code&gt; zugewiesen. Erst danach wird mit &lt;code&gt;getBar&lt;/code&gt; das nächste Promise-Objekt angefordert.&lt;/p&gt;
+&lt;p&gt;Im neueren ECMAScript-2016-Standard (ES7), welcher noch im Draft-Zustand ist, erhält dieser spezielle Anwendungsfall für Generator-Funktionen mit &lt;code&gt;async/await&lt;/code&gt; seine eigene Syntax. Dadurch braucht man keine eigene &lt;code&gt;runAsync&lt;/code&gt;-Funktion mehr.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;lang-javascript&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;async&lt;/span&gt; &lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;printFooBar&lt;/span&gt;(&lt;span class=&quot;params&quot;&gt;&lt;/span&gt;)&lt;/span&gt;{
+    &lt;span class=&quot;keyword&quot;&gt;var&lt;/span&gt; part1 = &lt;span class=&quot;keyword&quot;&gt;await&lt;/span&gt; getFoo()
+    &lt;span class=&quot;keyword&quot;&gt;var&lt;/span&gt; part2 = &lt;span class=&quot;keyword&quot;&gt;await&lt;/span&gt; getBar()
+    &lt;span class=&quot;built_in&quot;&gt;console&lt;/span&gt;.log(part1+part2)
+}
+
+printFooBar() &lt;span class=&quot;comment&quot;&gt;// foobar&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Unter der Haube läuft in beiden Fällen genau das selbe ab. Bis zur Finalisierung von ES7 lässt sich diese Funktionalität aber ebenfalls wie gezeigt erzielen. Für den produktiven Einsatz empfehle ich die Library “co” (&lt;a href=&quot;https://github.com/tj/co&quot;&gt;https://github.com/tj/co&lt;/a&gt;).&lt;/p&gt;
+&lt;h3 id=&quot;referenzen-&quot;&gt;Referenzen:&lt;/h3&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=_8Qyk5j_b-g&quot;&gt;https://www.youtube.com/watch?v=_8Qyk5j_b-g&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://davidwalsh.name/es6-generators&quot;&gt;https://davidwalsh.name/es6-generators&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+  </channel>
+</rss>

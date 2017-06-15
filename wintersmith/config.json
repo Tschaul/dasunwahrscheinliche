@@ -3,7 +3,7 @@
     "url": "http://localhost:8080",
     "name": "Das Unwahrscheinliche",
     "owner": "Julian Steinwachs",
-    "description": "Blog von Julian Steinwachs"
+    "description": "von Julian Steinwachs"
   },
   "plugins": [
     "./plugins/paginator.coffee"
