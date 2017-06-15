@@ -119,8 +119,10 @@ printFooBar() // foobar
 
 Unter der Haube läuft in beiden Fällen genau das selbe ab. Bis zur Finalisierung von ES7 lässt sich diese Funktionalität aber ebenfalls wie gezeigt erzielen. Für den produktiven Einsatz empfehle ich die Library "co" (https://github.com/tj/co).
 
-### Referenzen:
-
+#### Referenzen:
+<br/>
+[Video] Evolution of JavaScript: from ES5 to ES6 to ES7 <br/>
 https://www.youtube.com/watch?v=_8Qyk5j_b-g
 
+The Basics Of ES6 Generators<br/>
 https://davidwalsh.name/es6-generators
