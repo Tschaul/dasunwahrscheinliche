@@ -8,5 +8,5 @@
   "scripts": {
     "deploy": "npm run build && node deploy",
     "build": "wintersmith build"
-  },
+  }
 }
