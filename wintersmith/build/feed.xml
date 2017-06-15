@@ -99,9 +99,12 @@ runAsync(printFooBar) &lt;span class=&quot;comment&quot;&gt;// foobar&lt;/span&g
 printFooBar() &lt;span class=&quot;comment&quot;&gt;// foobar&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Unter der Haube läuft in beiden Fällen genau das selbe ab. Bis zur Finalisierung von ES7 lässt sich diese Funktionalität aber ebenfalls wie gezeigt erzielen. Für den produktiven Einsatz empfehle ich die Library “co” (&lt;a href=&quot;https://github.com/tj/co&quot;&gt;https://github.com/tj/co&lt;/a&gt;).&lt;/p&gt;
-&lt;h3 id=&quot;referenzen-&quot;&gt;Referenzen:&lt;/h3&gt;
-&lt;p&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=_8Qyk5j_b-g&quot;&gt;https://www.youtube.com/watch?v=_8Qyk5j_b-g&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&quot;https://davidwalsh.name/es6-generators&quot;&gt;https://davidwalsh.name/es6-generators&lt;/a&gt;&lt;/p&gt;
+&lt;h4 id=&quot;referenzen-&quot;&gt;Referenzen:&lt;/h4&gt;
+&lt;p&gt;&lt;br/&gt;
+[Video] Evolution of JavaScript: from ES5 to ES6 to ES7 &lt;br/&gt;
+&lt;a href=&quot;https://www.youtube.com/watch?v=_8Qyk5j_b-g&quot;&gt;https://www.youtube.com/watch?v=_8Qyk5j_b-g&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;The Basics Of ES6 Generators&lt;br/&gt;
+&lt;a href=&quot;https://davidwalsh.name/es6-generators&quot;&gt;https://davidwalsh.name/es6-generators&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
   </channel>
