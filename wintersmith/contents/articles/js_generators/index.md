@@ -17,14 +17,15 @@ In JavaScript kamen Generator-Funktionen mit dem ECMAScript-2015-Standard (ES6) 
 function* oneToThree() {
   yield 1
   yield 2
-  return 3
+  yield 3
 }
 
 var gen = oneToThree();
 
 console.log(gen.next()); // { value: 1, done: false }
 console.log(gen.next()); // { value: 2, done: false }
-console.log(gen.next()); // { value: 3, done: true }
+console.log(gen.next()); // { value: 3, done: false }
+console.log(gen.next()); // { value: undefined, done: true }
 ```
 
 Das erhaltene Generator-Objekt kann auch als Iterator verwendet werden. Dadurch lässt sich über die Ergebnisse auch mittels `for ... of` iterieren:
@@ -38,41 +39,45 @@ for (var num of oneToThree()){
 // 3
 ```
 
-Für unser Eingangsbeispiel der Supermarktkasse sind wir jetzt aber nur einen kleinen Schritt weiter. Denn dort sollen in der gesteuerten Schleife keine Werte erzeugt werden wie oben, sondern die Werte sollen in der Schleife Eingabe für Eingabe verarbeitet werden. In diesem benutzt man das Generator-Objekt als Observer. Ein Generator ist schlicht die Vereinigung von Iterator und Observer. 
+Für unser Eingangsbeispiel der Supermarktkasse sind wir jetzt aber nur einen kleinen Schritt weiter. Denn dort sollen in der gesteuerten Schleife keine Werte erzeugt werden wie oben, sondern die Werte sollen in der Schleife Eingabe für Eingabe verarbeitet werden. In diesem benutzt man das Generator-Objekt als Observer. Ein Generator ist schlicht die Vereinigung von Iterator und Observer.
 
 ```javascript
 function* logSomeStuff(){
-    While(true){
+    while(true){
         nextInput = yield;
         console.log(nextInput);
     }
 }
 var gen = logSomeStuff();
+gen.next()
 gen.next("foo") // foo
 gen.next("bar") // bar
 ```
 
-Hier wird das Schlüsselwort `yield` als Ausdruck benutzt und nicht als Statement. Die Auswertung des Ausdrucks hat den Effekt, dass die Funktion an dieser Stelle gestoppt wird bis der Observer mittels `next(...)` mit einem neuen Wert gefüttert wird. Dann wird der neue Wert an Stelle des `yield`-Ausdrucks gestellt und die Funktion läuft weiter.
+Hier wird das Schlüsselwort `yield` als Ausdruck benutzt und nicht als Statement. Die Auswertung des Ausdrucks hat den Effekt, dass die Funktion an dieser Stelle gestoppt wird bis der Observer mittels `next(...)` mit einem neuen Wert gefüttert wird. Dann wird der neue Wert an Stelle des `yield`-Ausdrucks gestellt und die Funktion läuft weiter. Damit der Generator überhaupt bis zum ersten `yield` ausgeführt wird muss einmal `next()` ohne Parameter aufgerufen werden, analog zum Iterator-Fall. Der erst Aufruf von `next(...)` ist also immer ohne Parameter.
 
-Mit diesem letzten Beispiel haben wir bereits den eingangs erwähnten Anwendungsfall des Supermarktkassen-Druckers erschlagen. Generator-Funktionen haben aber noch weit mehr zu bieten. Insbesondere für die asynchrone Programmierung sind Generatpr-Funktionen ein mächtiges Werkzeug, wie wir weiter unten sehen werden.
+Mit diesem letzten Beispiel haben wir bereits den eingangs erwähnten Anwendungsfall des Supermarktkassen-Druckers erschlagen. Generator-Funktionen haben aber noch weit mehr zu bieten. Insbesondere für die asynchrone Programmierung sind Generator-Funktionen ein mächtiges Werkzeug, wie wir weiter unten sehen werden.
 
-Man kann nämlich auch beide Aspekte des Generators (Observer und Iterator) kombinieren um bei jeder Iteration ein Teilergebnis zurückzugeben. Hier tritt aber die sprachliche Obskurität auf, dass `yield` sowohl als Statement als auch als Ausdruck verwendet wird. Dabei gilt, dass erst das `yield`-Statement ausgeführt wird, also ein Wert für die Iteration generiert wird, und anschließend das `yield`-Statement durch den Wert ersetzt wird mit dem der Generator gefüttert wurde. Folgendes Beispiel stellt einen Generator dar, der zurückgibt ob der zuletzt gefütterte Werte größer ist als der vorletzte.
+Man kann nämlich auch beide Aspekte des Generators (Observer und Iterator) kombinieren um bei jeder Iteration ein Teilergebnis zurückzugeben. Hier tritt aber die sprachliche Obskurität auf, dass `yield` sowohl als Statement als auch als Ausdruck verwendet wird. Zuerst wird das `yield`-Statement ausgeführt, also ein Wert für die Iteration generiert. Anschließend wird das `yield`-Statement durch den Wert ersetzt und der Generator wird bis zum nächsten `yield` ausgeführt. Folgendes Beispiel stellt einen Generator dar, der zurückgibt ob der gefütterte Werte größer ist als der letzte.
 
 ```javascript
 function* goingUp(){
     var old = yield;
     var now = yield;
     while(true){
-        var now = yield now > old;
+        var newval = yield now > old;
         old = now;
+	   now = newval;
     }
 }
 
 var gen = goingUp();
-console.log(gen.next(0).value)  // undefined 
-console.log(gen.next(2).value)  // undefined
-console.log(gen.next(1).value)  // true // 2 > 0
-console.log(gen.next(0).value)  // false // 1 < 2
+console.log(gen.next().value)  // undefined
+console.log(gen.next(0).value)  // undefined
+console.log(gen.next(1).value)  // true
+console.log(gen.next(2).value)  // true
+console.log(gen.next(2).value)  // false
+console.log(gen.next(1).value)  // false
 ```
 
 Eine solcher Generator kann z.B. benutzt werden um das erste lokale Maximum einer Zahlenreihe zu finden, ohne dass der Konsument der Funktion alle Werte zur Verfügung stellen muss. Das kann nützlich sein, wenn z.B. die Werte einzeln oder Batch-weise aus einer Datenbank gelesen werden müssen.
@@ -126,3 +131,6 @@ https://www.youtube.com/watch?v=_8Qyk5j_b-g
 
 The Basics Of ES6 Generators<br/>
 https://davidwalsh.name/es6-generators
+
+ES6 Generators in Depth <br/>
+http://2ality.com/2015/03/es6-generators.html
