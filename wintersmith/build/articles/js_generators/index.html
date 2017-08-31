@@ -28,14 +28,15 @@
 <pre><code class="lang-javascript"><span class="function"><span class="keyword">function</span>* <span class="title">oneToThree</span>(<span class="params"></span>) </span>{
   <span class="keyword">yield</span> <span class="number">1</span>
   <span class="keyword">yield</span> <span class="number">2</span>
-  <span class="keyword">return</span> <span class="number">3</span>
+  <span class="keyword">yield</span> <span class="number">3</span>
 }
 
 <span class="keyword">var</span> gen = oneToThree();
 
 <span class="built_in">console</span>.log(gen.next()); <span class="comment">// { value: 1, done: false }</span>
 <span class="built_in">console</span>.log(gen.next()); <span class="comment">// { value: 2, done: false }</span>
-<span class="built_in">console</span>.log(gen.next()); <span class="comment">// { value: 3, done: true }</span>
+<span class="built_in">console</span>.log(gen.next()); <span class="comment">// { value: 3, done: false }</span>
+<span class="built_in">console</span>.log(gen.next()); <span class="comment">// { value: undefined, done: true }</span>
 </code></pre>
 <p>Das erhaltene Generator-Objekt kann auch als Iterator verwendet werden. Dadurch lässt sich über die Ergebnisse auch mittels <code>for ... of</code> iterieren:</p>
 <pre><code class="lang-javascript"><span class="keyword">for</span> (<span class="keyword">var</span> num <span class="keyword">of</span> oneToThree()){
@@ -45,34 +46,38 @@
 <span class="comment">// 2</span>
 <span class="comment">// 3</span>
 </code></pre>
-<p>Für unser Eingangsbeispiel der Supermarktkasse sind wir jetzt aber nur einen kleinen Schritt weiter. Denn dort sollen in der gesteuerten Schleife keine Werte erzeugt werden wie oben, sondern die Werte sollen in der Schleife Eingabe für Eingabe verarbeitet werden. In diesem benutzt man das Generator-Objekt als Observer. Ein Generator ist schlicht die Vereinigung von Iterator und&nbsp;Observer. </p>
+<p>Für unser Eingangsbeispiel der Supermarktkasse sind wir jetzt aber nur einen kleinen Schritt weiter. Denn dort sollen in der gesteuerten Schleife keine Werte erzeugt werden wie oben, sondern die Werte sollen in der Schleife Eingabe für Eingabe verarbeitet werden. In diesem benutzt man das Generator-Objekt als Observer. Ein Generator ist schlicht die Vereinigung von Iterator und&nbsp;Observer.</p>
 <pre><code class="lang-javascript"><span class="function"><span class="keyword">function</span>* <span class="title">logSomeStuff</span>(<span class="params"></span>)</span>{
-    While(<span class="literal">true</span>){
+    <span class="keyword">while</span>(<span class="literal">true</span>){
         nextInput = <span class="keyword">yield</span>;
         <span class="built_in">console</span>.log(nextInput);
     }
 }
 <span class="keyword">var</span> gen = logSomeStuff();
+gen.next()
 gen.next(<span class="string">"foo"</span>) <span class="comment">// foo</span>
 gen.next(<span class="string">"bar"</span>) <span class="comment">// bar</span>
 </code></pre>
-<p>Hier wird das Schlüsselwort <code>yield</code> als Ausdruck benutzt und nicht als Statement. Die Auswertung des Ausdrucks hat den Effekt, dass die Funktion an dieser Stelle gestoppt wird bis der Observer mittels <code>next(...)</code> mit einem neuen Wert gefüttert wird. Dann wird der neue Wert an Stelle des <code>yield</code>-Ausdrucks gestellt und die Funktion läuft&nbsp;weiter.</p>
-<p>Mit diesem letzten Beispiel haben wir bereits den eingangs erwähnten Anwendungsfall des Supermarktkassen-Druckers erschlagen. Generator-Funktionen haben aber noch weit mehr zu bieten. Insbesondere für die asynchrone Programmierung sind Generatpr-Funktionen ein mächtiges Werkzeug, wie wir weiter unten sehen&nbsp;werden.</p>
-<p>Man kann nämlich auch beide Aspekte des Generators (Observer und Iterator) kombinieren um bei jeder Iteration ein Teilergebnis zurückzugeben. Hier tritt aber die sprachliche Obskurität auf, dass <code>yield</code> sowohl als Statement als auch als Ausdruck verwendet wird. Dabei gilt, dass erst das <code>yield</code>-Statement ausgeführt wird, also ein Wert für die Iteration generiert wird, und anschließend das <code>yield</code>-Statement durch den Wert ersetzt wird mit dem der Generator gefüttert wurde. Folgendes Beispiel stellt einen Generator dar, der zurückgibt ob der zuletzt gefütterte Werte größer ist als der&nbsp;vorletzte.</p>
+<p>Hier wird das Schlüsselwort <code>yield</code> als Ausdruck benutzt und nicht als Statement. Die Auswertung des Ausdrucks hat den Effekt, dass die Funktion an dieser Stelle gestoppt wird bis der Observer mittels <code>next(...)</code> mit einem neuen Wert gefüttert wird. Dann wird der neue Wert an Stelle des <code>yield</code>-Ausdrucks gestellt und die Funktion läuft weiter. Damit der Generator überhaupt bis zum ersten <code>yield</code> ausgeführt wird muss einmal <code>next()</code> ohne Parameter aufgerufen werden, analog zum Iterator-Fall. Der erst Aufruf von <code>next(...)</code> ist also immer ohne&nbsp;Parameter.</p>
+<p>Mit diesem letzten Beispiel haben wir bereits den eingangs erwähnten Anwendungsfall des Supermarktkassen-Druckers erschlagen. Generator-Funktionen haben aber noch weit mehr zu bieten. Insbesondere für die asynchrone Programmierung sind Generator-Funktionen ein mächtiges Werkzeug, wie wir weiter unten sehen&nbsp;werden.</p>
+<p>Man kann nämlich auch beide Aspekte des Generators (Observer und Iterator) kombinieren um bei jeder Iteration ein Teilergebnis zurückzugeben. Hier tritt aber die sprachliche Obskurität auf, dass <code>yield</code> sowohl als Statement als auch als Ausdruck verwendet wird. Zuerst wird das <code>yield</code>-Statement ausgeführt, also ein Wert für die Iteration generiert. Anschließend wird das <code>yield</code>-Statement durch den Wert ersetzt und der Generator wird bis zum nächsten <code>yield</code> ausgeführt. Folgendes Beispiel stellt einen Generator dar, der zurückgibt ob der gefütterte Werte größer ist als der&nbsp;letzte.</p>
 <pre><code class="lang-javascript"><span class="function"><span class="keyword">function</span>* <span class="title">goingUp</span>(<span class="params"></span>)</span>{
     <span class="keyword">var</span> old = <span class="keyword">yield</span>;
     <span class="keyword">var</span> now = <span class="keyword">yield</span>;
     <span class="keyword">while</span>(<span class="literal">true</span>){
-        <span class="keyword">var</span> now = <span class="keyword">yield</span> now &gt; old;
+        <span class="keyword">var</span> newval = <span class="keyword">yield</span> now &gt; old;
         old = now;
+       now = newval;
     }
 }
 
 <span class="keyword">var</span> gen = goingUp();
-<span class="built_in">console</span>.log(gen.next(<span class="number">0</span>).value)  <span class="comment">// undefined </span>
-<span class="built_in">console</span>.log(gen.next(<span class="number">2</span>).value)  <span class="comment">// undefined</span>
-<span class="built_in">console</span>.log(gen.next(<span class="number">1</span>).value)  <span class="comment">// true // 2 &gt; 0</span>
-<span class="built_in">console</span>.log(gen.next(<span class="number">0</span>).value)  <span class="comment">// false // 1 &lt; 2</span>
+<span class="built_in">console</span>.log(gen.next().value)  <span class="comment">// undefined</span>
+<span class="built_in">console</span>.log(gen.next(<span class="number">0</span>).value)  <span class="comment">// undefined</span>
+<span class="built_in">console</span>.log(gen.next(<span class="number">1</span>).value)  <span class="comment">// true</span>
+<span class="built_in">console</span>.log(gen.next(<span class="number">2</span>).value)  <span class="comment">// true</span>
+<span class="built_in">console</span>.log(gen.next(<span class="number">2</span>).value)  <span class="comment">// false</span>
+<span class="built_in">console</span>.log(gen.next(<span class="number">1</span>).value)  <span class="comment">// false</span>
 </code></pre>
 <p>Eine solcher Generator kann z.B. benutzt werden um das erste lokale Maximum einer Zahlenreihe zu finden, ohne dass der Konsument der Funktion alle Werte zur Verfügung stellen muss. Das kann nützlich sein, wenn z.B. die Werte einzeln oder Batch-weise aus einer Datenbank gelesen werden&nbsp;müssen.</p>
 <p>Die doppelte Natur von Generator-Funktionen lässt sich außerdem ausnutzen um asynchronen JavaScript-Code leichter lesbar zu gestalten. Dazu schreiben wir uns eine wiederverwendbare Funktion <code>runAsync</code> die als einzigen Parameter eine Generator-Funktion erwartet, welche Promise-Objekte zurückgibt. Promises sind Stellvertreter-Objekte für zukünftige Rückgabewerte und entsprechen etwa Futures in Java/C++ oder Tasks in c#. Die <code>runAsync</code>-Funktion nimmt die Promises entgegen und füttert asynchron nach deren Auflösung das Ergebnis zurück in den Generator. Zwecks der Kürze ist in folgendem Beispiel die Fehlerbehandlung absichtlich&nbsp;ausgelassen.</p>
@@ -112,6 +117,8 @@ printFooBar() <span class="comment">// foobar</span>
 <a href="https://www.youtube.com/watch?v=_8Qyk5j_b-g">https://www.youtube.com/watch?v=_8Qyk5j_b-g</a></p>
 <p>The Basics Of <span class="caps">ES6</span> Generators<br/>
 <a href="https://davidwalsh.name/es6-generators">https://davidwalsh.name/es6-generators</a></p>
+<p><span class="caps">ES6</span> Generators in Depth <br/>
+<a href="http://2ality.com/2015/03/es6-generators.html">http://2ality.com/2015/03/es6-generators.html</a></p>
 </section>
         </article>
       </div>

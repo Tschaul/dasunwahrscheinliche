@@ -5,9 +5,28 @@
     <atom:link href="http://localhost:8080/feed.xml" rel="self" type="application/rss+xml"></atom:link>
     <link>http://localhost:8080</link>
     <description>von Julian Steinwachs</description>
-    <pubDate>Thu, 15 Jun 2017 02:00:00 +0200</pubDate>
+    <pubDate>Thu, 31  Aug 2017 02:00:00 +0200</pubDate>
     <generator>Wintersmith - https://github.com/jnordberg/wintersmith</generator>
     <language>en</language>
+    <item>
+      <title>CouchDB: alt aber oho</title>
+      <link>http://localhost:8080/articles/couchdb/</link>
+      <pubDate>Thu, 31  Aug 2017 02:00:00 +0200</pubDate>
+      <guid isPermaLink="true">http://localhost:8080/articles/couchdb/</guid>
+      <author></author>
+      <description>&lt;p&gt;&lt;a href=&quot;http://couchdb.apache.org/&quot;&gt;CouchDB&lt;/a&gt; wird gerne als eine von viele NoSQL-Datenbanken verschrien, was dem Projekt in keiner Weise gerecht wird. CouchDB ist eine dokumentenorientierte Datenbank, die von Grund auf als vollwertiges Backend für Webanwendungen konzipiert ist. D.h. es ist keine klassische Geschäftslogik-Schicht vorgesehen bzw. notwendig. Stattdessen setzt CouchDB konsequent auf Command-Query-Repsonsibility-Segregation (CQRS) und bietet an, Validierungs-Funktionen (auf Command-Seite) und Aggregations-Funktionen (für die Query-Seite) zu hinterlegen. Diese werden in JavaScript definiert und bilden die Geschäftslogik vollständig ab. Die Applikationslogik (der Fluß/Ablauf der Anwendung) wird von der Browserseite gesteuert.&lt;/p&gt;
+&lt;p&gt;&lt;span class=&quot;more&quot;&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Die Ansätze: Dokumentenorientiert, CQRS, JavaScript im Backend und Applikationslogik im Browser sind Ansätze, die zur Zeit als CouchDB rauskam (2005) noch höchst experimentell waren, aber mittlerweile etabliert sind. Ich habe CouchDB schon seit einiger Zeit auf dem Schirm und endlich das richtige Projekt gefunden um sie mal auszuprobieren: Mein neues &lt;a href=&quot;https://github.com/tschaul/AJExpenditor2&quot;&gt;Haushaltsbuch&lt;/a&gt;. Mein altes Haushaltsbuch (namentlich AJExpenditor) ist mittlerweile etwas in die Jahre gekommen. Der Ansatz, alle Einträge in einer großen json-Datei zu speichern, skaliert nicht mehr mit.&lt;/p&gt;
+&lt;p&gt;Bei vielen Datenbanken muss man, sobald das Datenmodel etwas komplexer ist, sich immer entscheiden, ob man sicherstellen will, dass alle Daten konsistent sind (also die Daten strikt normalisieren) und dafür lange Abfragezeiten in Kauf nimmt, oder ob man Inkonsistenzen riskiert (durch Denormalisierung) und dadurch aber effizienter auf die Daten zugreifen kann.&lt;/p&gt;
+&lt;p&gt;Im Fall des AJExpenditor betrifft das die Aggregation der Ausgaben für bestimmte Zeiträume (Monatlich, Jährlich, Alle, …). Im alten System musste nach jeder Änderung eine Bereinigungsroutine alle Daten ab dem betroffenen Zeitpunkt neu berechnen, um wieder Konsistenz herzustellen.&lt;/p&gt;
+&lt;p&gt;CouchDB trennt Lese- und Schreibzugriffe konsequent und löst so das Dilemma. Dieser Ansatz wird gängigerweise als CQRS bezeichnet. Es gibt ein strikt normalisiertes WriteModel, wovon sich die ReadModels, also die abfragebaren Daten, ableiten. Wichtig ist dabei, dass das WriteModel kein Wissen über die ReadModels hat. In CouchDB ist das über sogenannte Views gelöst. Eine View besteht aus einer map-Funktion die Dokumente einem, keinem oder mehreren Schlüsseln zuordnet. Zusätzlich kann eine weitere reduce-Funktion definiert werden, die die Dokumente mit gleichem Schlüssel aggregiert (also z.B. eine Summe über diese bildet). CouchDB speichert die Zwischenergebnisse seiner Berechnung sehr effizient in einem B-tree ab und kann dadurch die Ergebnisse der View bei jedem Schreibzugriff anpassen. Dieses Feature ist natürlich wie gemacht für die Summierung meiner Haushalts-Ausgaben aus bestimmten Perioden.&lt;/p&gt;
+&lt;p&gt;Die Views werden in sogenannten Designdokumenten in der Datenbank hinterlegt. Außerdem lässt sich eine Validierungsfunktion definieren. Die Validierungsfunktion wird vor jedem Schreibzugriff ausgeführt und stellt die Konsistenz der Dokumente sicher. Sie kann jedoch nicht Konsistenz über mehrere Dokumente hinweg sicherstellen. Zum Beispiel kann CouchDB nicht sicherstellen, dass eine Referenz auf ein anderes Objekt via dessen ID nicht ins leere greift. Aggregate von Domänenobjekten müssen deshalb immer in einem Dokument gespeichert sein. Das beduetet, man muss bei der Datenmodellierung gut aufpassen, dass man die Aggregate/Dokumente richtig schneidet.&lt;/p&gt;
+&lt;p&gt;Die Logik der map- und reduce-Funktionen ist dabei in JavaScript definiert. Die Wahl von JavaScript als Abfrage-Sprache ist für das Alter des CouchDB-Projekts wirklich beachtlich. Ein Problem, dass mir dabei immer wieder in die Quere kam, ist, dass die JavaScript-VM, die in CouchDB eingesetzt wird, etwas in die Jahre gekommen ist. Immer wieder haben bestimmte Aufrufe, z.B. auf Arrays, nicht funktioniert, weil die Funktionen nicht vorhanden waren. Generell ist das aber ein überwindbares Hindernis. Ich habe für die Designdokumente sowohl auf Module als auch auf TypeScript verzichtet. Beides ist sicher möglich zu verwenden aber ecklig einzurichten.&lt;/p&gt;
+&lt;p&gt;Ein Bonus der Designdokumente ist, dass sie auch statische Dateien als Anhänge enthalten können. Diese können auch statisches html enthalten, welches dann über http abgerufen werden kann. Sprich, die Datenbank kann das Frontend zu seiner Anwendung ausliefern. Dadurch wird die ganze Anwendung sozusagen self-contained. Dieser Anwendungsfall ist ausdrücklich so gedacht. Die beiliegende Datenbankverwaltung funktioniert ebenfalls auf diese Weise.&lt;/p&gt;
+&lt;p&gt;Jenseits von Views, Validierungsfunktion und ein paar anderen Funktionen lässt sich in der Datenbank jedoch keine Logik hinterlegen. Deshalb muss der gesamte Anwendungsfluß im Frontend gesteuert werden. Es bietet sich also an, eine Single-Page-Application einzusetzen. Die API, mit der das Frontend mit der Datenbank kommuniziert, ist vollständig Rest-basiert, d.h. auch hier fällt der Bedarf für eine Middleware (z.B. in nodejs) weg. In Fall des AJExpenditor2 habe ich mich für einen React+MobX-Stack entschieden mit React-Bootstrap als UI-Framework. &lt;/p&gt;
+&lt;p&gt;Als Fazit muss ich sagen, dass ich wirklich erstaunt bin, wie gut sich CouchDB für die Entwicklung einer Web-Applikation nach allen aktuell gültigen Regeln der Kunst eignet. CouchDB war einfach zu früh dran und verdient heutzutage weit mehr Beachtung. Vor allem in der heutigen Mirco-Service-Welt wäre CouchDB für viele Anwendungsfälle die richtige Wahl.&lt;/p&gt;
+</description>
+    </item>
     <item>
       <title>Generator-Funktionen in JavaScript</title>
       <link>http://localhost:8080/articles/js_generators/</link>
@@ -21,14 +40,15 @@
 &lt;pre&gt;&lt;code class=&quot;lang-javascript&quot;&gt;&lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;function&lt;/span&gt;* &lt;span class=&quot;title&quot;&gt;oneToThree&lt;/span&gt;(&lt;span class=&quot;params&quot;&gt;&lt;/span&gt;) &lt;/span&gt;{
   &lt;span class=&quot;keyword&quot;&gt;yield&lt;/span&gt; &lt;span class=&quot;number&quot;&gt;1&lt;/span&gt;
   &lt;span class=&quot;keyword&quot;&gt;yield&lt;/span&gt; &lt;span class=&quot;number&quot;&gt;2&lt;/span&gt;
-  &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;number&quot;&gt;3&lt;/span&gt;
+  &lt;span class=&quot;keyword&quot;&gt;yield&lt;/span&gt; &lt;span class=&quot;number&quot;&gt;3&lt;/span&gt;
 }
 
 &lt;span class=&quot;keyword&quot;&gt;var&lt;/span&gt; gen = oneToThree();
 
 &lt;span class=&quot;built_in&quot;&gt;console&lt;/span&gt;.log(gen.next()); &lt;span class=&quot;comment&quot;&gt;// { value: 1, done: false }&lt;/span&gt;
 &lt;span class=&quot;built_in&quot;&gt;console&lt;/span&gt;.log(gen.next()); &lt;span class=&quot;comment&quot;&gt;// { value: 2, done: false }&lt;/span&gt;
-&lt;span class=&quot;built_in&quot;&gt;console&lt;/span&gt;.log(gen.next()); &lt;span class=&quot;comment&quot;&gt;// { value: 3, done: true }&lt;/span&gt;
+&lt;span class=&quot;built_in&quot;&gt;console&lt;/span&gt;.log(gen.next()); &lt;span class=&quot;comment&quot;&gt;// { value: 3, done: false }&lt;/span&gt;
+&lt;span class=&quot;built_in&quot;&gt;console&lt;/span&gt;.log(gen.next()); &lt;span class=&quot;comment&quot;&gt;// { value: undefined, done: true }&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Das erhaltene Generator-Objekt kann auch als Iterator verwendet werden. Dadurch lässt sich über die Ergebnisse auch mittels &lt;code&gt;for ... of&lt;/code&gt; iterieren:&lt;/p&gt;
 &lt;pre&gt;&lt;code class=&quot;lang-javascript&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;for&lt;/span&gt; (&lt;span class=&quot;keyword&quot;&gt;var&lt;/span&gt; num &lt;span class=&quot;keyword&quot;&gt;of&lt;/span&gt; oneToThree()){
@@ -38,34 +58,38 @@
 &lt;span class=&quot;comment&quot;&gt;// 2&lt;/span&gt;
 &lt;span class=&quot;comment&quot;&gt;// 3&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Für unser Eingangsbeispiel der Supermarktkasse sind wir jetzt aber nur einen kleinen Schritt weiter. Denn dort sollen in der gesteuerten Schleife keine Werte erzeugt werden wie oben, sondern die Werte sollen in der Schleife Eingabe für Eingabe verarbeitet werden. In diesem benutzt man das Generator-Objekt als Observer. Ein Generator ist schlicht die Vereinigung von Iterator und Observer. &lt;/p&gt;
+&lt;p&gt;Für unser Eingangsbeispiel der Supermarktkasse sind wir jetzt aber nur einen kleinen Schritt weiter. Denn dort sollen in der gesteuerten Schleife keine Werte erzeugt werden wie oben, sondern die Werte sollen in der Schleife Eingabe für Eingabe verarbeitet werden. In diesem benutzt man das Generator-Objekt als Observer. Ein Generator ist schlicht die Vereinigung von Iterator und Observer.&lt;/p&gt;
 &lt;pre&gt;&lt;code class=&quot;lang-javascript&quot;&gt;&lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;function&lt;/span&gt;* &lt;span class=&quot;title&quot;&gt;logSomeStuff&lt;/span&gt;(&lt;span class=&quot;params&quot;&gt;&lt;/span&gt;)&lt;/span&gt;{
-    While(&lt;span class=&quot;literal&quot;&gt;true&lt;/span&gt;){
+    &lt;span class=&quot;keyword&quot;&gt;while&lt;/span&gt;(&lt;span class=&quot;literal&quot;&gt;true&lt;/span&gt;){
         nextInput = &lt;span class=&quot;keyword&quot;&gt;yield&lt;/span&gt;;
         &lt;span class=&quot;built_in&quot;&gt;console&lt;/span&gt;.log(nextInput);
     }
 }
 &lt;span class=&quot;keyword&quot;&gt;var&lt;/span&gt; gen = logSomeStuff();
+gen.next()
 gen.next(&lt;span class=&quot;string&quot;&gt;&quot;foo&quot;&lt;/span&gt;) &lt;span class=&quot;comment&quot;&gt;// foo&lt;/span&gt;
 gen.next(&lt;span class=&quot;string&quot;&gt;&quot;bar&quot;&lt;/span&gt;) &lt;span class=&quot;comment&quot;&gt;// bar&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Hier wird das Schlüsselwort &lt;code&gt;yield&lt;/code&gt; als Ausdruck benutzt und nicht als Statement. Die Auswertung des Ausdrucks hat den Effekt, dass die Funktion an dieser Stelle gestoppt wird bis der Observer mittels &lt;code&gt;next(...)&lt;/code&gt; mit einem neuen Wert gefüttert wird. Dann wird der neue Wert an Stelle des &lt;code&gt;yield&lt;/code&gt;-Ausdrucks gestellt und die Funktion läuft weiter.&lt;/p&gt;
-&lt;p&gt;Mit diesem letzten Beispiel haben wir bereits den eingangs erwähnten Anwendungsfall des Supermarktkassen-Druckers erschlagen. Generator-Funktionen haben aber noch weit mehr zu bieten. Insbesondere für die asynchrone Programmierung sind Generatpr-Funktionen ein mächtiges Werkzeug, wie wir weiter unten sehen werden.&lt;/p&gt;
-&lt;p&gt;Man kann nämlich auch beide Aspekte des Generators (Observer und Iterator) kombinieren um bei jeder Iteration ein Teilergebnis zurückzugeben. Hier tritt aber die sprachliche Obskurität auf, dass &lt;code&gt;yield&lt;/code&gt; sowohl als Statement als auch als Ausdruck verwendet wird. Dabei gilt, dass erst das &lt;code&gt;yield&lt;/code&gt;-Statement ausgeführt wird, also ein Wert für die Iteration generiert wird, und anschließend das &lt;code&gt;yield&lt;/code&gt;-Statement durch den Wert ersetzt wird mit dem der Generator gefüttert wurde. Folgendes Beispiel stellt einen Generator dar, der zurückgibt ob der zuletzt gefütterte Werte größer ist als der vorletzte.&lt;/p&gt;
+&lt;p&gt;Hier wird das Schlüsselwort &lt;code&gt;yield&lt;/code&gt; als Ausdruck benutzt und nicht als Statement. Die Auswertung des Ausdrucks hat den Effekt, dass die Funktion an dieser Stelle gestoppt wird bis der Observer mittels &lt;code&gt;next(...)&lt;/code&gt; mit einem neuen Wert gefüttert wird. Dann wird der neue Wert an Stelle des &lt;code&gt;yield&lt;/code&gt;-Ausdrucks gestellt und die Funktion läuft weiter. Damit der Generator überhaupt bis zum ersten &lt;code&gt;yield&lt;/code&gt; ausgeführt wird muss einmal &lt;code&gt;next()&lt;/code&gt; ohne Parameter aufgerufen werden, analog zum Iterator-Fall. Der erst Aufruf von &lt;code&gt;next(...)&lt;/code&gt; ist also immer ohne Parameter.&lt;/p&gt;
+&lt;p&gt;Mit diesem letzten Beispiel haben wir bereits den eingangs erwähnten Anwendungsfall des Supermarktkassen-Druckers erschlagen. Generator-Funktionen haben aber noch weit mehr zu bieten. Insbesondere für die asynchrone Programmierung sind Generator-Funktionen ein mächtiges Werkzeug, wie wir weiter unten sehen werden.&lt;/p&gt;
+&lt;p&gt;Man kann nämlich auch beide Aspekte des Generators (Observer und Iterator) kombinieren um bei jeder Iteration ein Teilergebnis zurückzugeben. Hier tritt aber die sprachliche Obskurität auf, dass &lt;code&gt;yield&lt;/code&gt; sowohl als Statement als auch als Ausdruck verwendet wird. Zuerst wird das &lt;code&gt;yield&lt;/code&gt;-Statement ausgeführt, also ein Wert für die Iteration generiert. Anschließend wird das &lt;code&gt;yield&lt;/code&gt;-Statement durch den Wert ersetzt und der Generator wird bis zum nächsten &lt;code&gt;yield&lt;/code&gt; ausgeführt. Folgendes Beispiel stellt einen Generator dar, der zurückgibt ob der gefütterte Werte größer ist als der letzte.&lt;/p&gt;
 &lt;pre&gt;&lt;code class=&quot;lang-javascript&quot;&gt;&lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;function&lt;/span&gt;* &lt;span class=&quot;title&quot;&gt;goingUp&lt;/span&gt;(&lt;span class=&quot;params&quot;&gt;&lt;/span&gt;)&lt;/span&gt;{
     &lt;span class=&quot;keyword&quot;&gt;var&lt;/span&gt; old = &lt;span class=&quot;keyword&quot;&gt;yield&lt;/span&gt;;
     &lt;span class=&quot;keyword&quot;&gt;var&lt;/span&gt; now = &lt;span class=&quot;keyword&quot;&gt;yield&lt;/span&gt;;
     &lt;span class=&quot;keyword&quot;&gt;while&lt;/span&gt;(&lt;span class=&quot;literal&quot;&gt;true&lt;/span&gt;){
-        &lt;span class=&quot;keyword&quot;&gt;var&lt;/span&gt; now = &lt;span class=&quot;keyword&quot;&gt;yield&lt;/span&gt; now &amp;gt; old;
+        &lt;span class=&quot;keyword&quot;&gt;var&lt;/span&gt; newval = &lt;span class=&quot;keyword&quot;&gt;yield&lt;/span&gt; now &amp;gt; old;
         old = now;
+       now = newval;
     }
 }
 
 &lt;span class=&quot;keyword&quot;&gt;var&lt;/span&gt; gen = goingUp();
-&lt;span class=&quot;built_in&quot;&gt;console&lt;/span&gt;.log(gen.next(&lt;span class=&quot;number&quot;&gt;0&lt;/span&gt;).value)  &lt;span class=&quot;comment&quot;&gt;// undefined &lt;/span&gt;
-&lt;span class=&quot;built_in&quot;&gt;console&lt;/span&gt;.log(gen.next(&lt;span class=&quot;number&quot;&gt;2&lt;/span&gt;).value)  &lt;span class=&quot;comment&quot;&gt;// undefined&lt;/span&gt;
-&lt;span class=&quot;built_in&quot;&gt;console&lt;/span&gt;.log(gen.next(&lt;span class=&quot;number&quot;&gt;1&lt;/span&gt;).value)  &lt;span class=&quot;comment&quot;&gt;// true // 2 &amp;gt; 0&lt;/span&gt;
-&lt;span class=&quot;built_in&quot;&gt;console&lt;/span&gt;.log(gen.next(&lt;span class=&quot;number&quot;&gt;0&lt;/span&gt;).value)  &lt;span class=&quot;comment&quot;&gt;// false // 1 &amp;lt; 2&lt;/span&gt;
+&lt;span class=&quot;built_in&quot;&gt;console&lt;/span&gt;.log(gen.next().value)  &lt;span class=&quot;comment&quot;&gt;// undefined&lt;/span&gt;
+&lt;span class=&quot;built_in&quot;&gt;console&lt;/span&gt;.log(gen.next(&lt;span class=&quot;number&quot;&gt;0&lt;/span&gt;).value)  &lt;span class=&quot;comment&quot;&gt;// undefined&lt;/span&gt;
+&lt;span class=&quot;built_in&quot;&gt;console&lt;/span&gt;.log(gen.next(&lt;span class=&quot;number&quot;&gt;1&lt;/span&gt;).value)  &lt;span class=&quot;comment&quot;&gt;// true&lt;/span&gt;
+&lt;span class=&quot;built_in&quot;&gt;console&lt;/span&gt;.log(gen.next(&lt;span class=&quot;number&quot;&gt;2&lt;/span&gt;).value)  &lt;span class=&quot;comment&quot;&gt;// true&lt;/span&gt;
+&lt;span class=&quot;built_in&quot;&gt;console&lt;/span&gt;.log(gen.next(&lt;span class=&quot;number&quot;&gt;2&lt;/span&gt;).value)  &lt;span class=&quot;comment&quot;&gt;// false&lt;/span&gt;
+&lt;span class=&quot;built_in&quot;&gt;console&lt;/span&gt;.log(gen.next(&lt;span class=&quot;number&quot;&gt;1&lt;/span&gt;).value)  &lt;span class=&quot;comment&quot;&gt;// false&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Eine solcher Generator kann z.B. benutzt werden um das erste lokale Maximum einer Zahlenreihe zu finden, ohne dass der Konsument der Funktion alle Werte zur Verfügung stellen muss. Das kann nützlich sein, wenn z.B. die Werte einzeln oder Batch-weise aus einer Datenbank gelesen werden müssen.&lt;/p&gt;
 &lt;p&gt;Die doppelte Natur von Generator-Funktionen lässt sich außerdem ausnutzen um asynchronen JavaScript-Code leichter lesbar zu gestalten. Dazu schreiben wir uns eine wiederverwendbare Funktion &lt;code&gt;runAsync&lt;/code&gt; die als einzigen Parameter eine Generator-Funktion erwartet, welche Promise-Objekte zurückgibt. Promises sind Stellvertreter-Objekte für zukünftige Rückgabewerte und entsprechen etwa Futures in Java/C++ oder Tasks in c#. Die &lt;code&gt;runAsync&lt;/code&gt;-Funktion nimmt die Promises entgegen und füttert asynchron nach deren Auflösung das Ergebnis zurück in den Generator. Zwecks der Kürze ist in folgendem Beispiel die Fehlerbehandlung absichtlich ausgelassen.&lt;/p&gt;
@@ -105,6 +129,8 @@ printFooBar() &lt;span class=&quot;comment&quot;&gt;// foobar&lt;/span&gt;
 &lt;a href=&quot;https://www.youtube.com/watch?v=_8Qyk5j_b-g&quot;&gt;https://www.youtube.com/watch?v=_8Qyk5j_b-g&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;The Basics Of ES6 Generators&lt;br/&gt;
 &lt;a href=&quot;https://davidwalsh.name/es6-generators&quot;&gt;https://davidwalsh.name/es6-generators&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;ES6 Generators in Depth &lt;br/&gt;
+&lt;a href=&quot;http://2ality.com/2015/03/es6-generators.html&quot;&gt;http://2ality.com/2015/03/es6-generators.html&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
   </channel>
