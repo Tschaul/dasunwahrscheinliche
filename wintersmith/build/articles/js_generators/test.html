@@ -1,0 +1,100 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+    </head>
+    <body>
+        <script>
+            
+
+console.log("=== one to three ===")
+
+function* oneToThree() {
+  yield 1
+  yield 2
+  yield 3
+}
+
+var gen = oneToThree();
+
+console.log(gen.next()); // { value: 1, done: false }
+console.log(gen.next()); // { value: 2, done: false }
+console.log(gen.next()); // { value: 3, done: false }
+console.log(gen.next()); // { value: undefined, done: true }
+
+console.log("=== for ... of ===")
+
+for (var num of oneToThree()){
+    console.log(num)
+}
+// 1
+// 2
+// 3
+
+console.log("=== log some stuff ===")
+
+function* logSomeStuff(){
+    while(true){
+        nextInput = yield;
+        console.log(nextInput);
+    }
+}
+var gen = logSomeStuff();
+console.log('call')
+gen.next() // bar
+console.log('call', 'foo')
+gen.next("foo") // foo
+console.log('call', 'bar')
+gen.next("bar") // bar
+
+console.log("=== going up ===")
+
+function* goingUp(){
+    var old = yield;
+    var now = yield;
+    while(true){
+        var newval = yield now > old;
+        old = now;
+	now = newval;
+	
+    }
+}
+
+var gen = goingUp();
+console.log(undefined,gen.next().value)  // undefined 
+console.log(0,gen.next(0).value)  // undefined 
+console.log(1,gen.next(1).value)  // true 
+console.log(2,gen.next(2).value)  // true 
+console.log(2,gen.next(2).value)  // false 
+console.log(1,gen.next(1).value)  // false 
+console.log(0,gen.next(0).value)  // false 
+
+console.log("=== run async ===")
+
+function runAsync(generator){
+    var it = generator();
+    (function iterate(val){
+        var ret = it.next( val );
+        if (!ret.done) {
+            ret.value.then( iterate );
+        }
+    })();
+}
+
+function getFoo() {
+	return Promise.resolve('foo')
+}
+
+function getBar() {
+	return Promise.resolve('bar')
+}
+
+function* printFooBar(){
+    var part1 = yield getFoo()
+    var part2 = yield getBar()
+    console.log(part1+part2)
+}
+
+runAsync(printFooBar) // foobar
+        </script>
+    </body>
+</html>

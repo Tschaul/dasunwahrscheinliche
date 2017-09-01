@@ -1,0 +1,28 @@
+---
+title: "CouchDB: alt aber oho"
+author: tschaul
+date: 2017-08-31
+template: article.jade
+---
+
+[CouchDB](http://couchdb.apache.org/) wird gerne als eine von viele NoSQL-Datenbanken verschrien, was dem Projekt in keiner Weise gerecht wird. CouchDB ist eine dokumentenorientierte Datenbank, die von Grund auf als vollwertiges Backend für Webanwendungen konzipiert ist. D.h. es ist keine klassische Geschäftslogik-Schicht vorgesehen bzw. notwendig. Stattdessen setzt CouchDB konsequent auf Command-Query-Repsonsibility-Segregation (CQRS) und bietet an, Validierungs-Funktionen (auf Command-Seite) und Aggregations-Funktionen (für die Query-Seite) zu hinterlegen. Diese werden in JavaScript definiert und bilden die Geschäftslogik vollständig ab. Die Applikationslogik (der Fluß/Ablauf der Anwendung) wird von der Browserseite gesteuert.
+
+<span class="more"></span>
+
+Die Ansätze: Dokumentenorientiert, CQRS, JavaScript im Backend und Applikationslogik im Browser sind Ansätze, die zur Zeit als CouchDB rauskam (2005) noch höchst experimentell waren, aber mittlerweile etabliert sind. Ich habe CouchDB schon seit einiger Zeit auf dem Schirm und endlich das richtige Projekt gefunden um sie mal auszuprobieren: Mein neues [Haushaltsbuch](https://github.com/tschaul/AJExpenditor2). Mein altes Haushaltsbuch (namentlich AJExpenditor) ist mittlerweile etwas in die Jahre gekommen. Der Ansatz, alle Einträge in einer großen json-Datei zu speichern, skaliert nicht mehr mit.
+
+Bei vielen Datenbanken muss man, sobald das Datenmodel etwas komplexer ist, sich immer entscheiden, ob man sicherstellen will, dass alle Daten konsistent sind (also die Daten strikt normalisieren) und dafür lange Abfragezeiten in Kauf nimmt, oder ob man Inkonsistenzen riskiert (durch Denormalisierung) und dadurch aber effizienter auf die Daten zugreifen kann.
+
+Im Fall des AJExpenditor betrifft das die Aggregation der Ausgaben für bestimmte Zeiträume (Monatlich, Jährlich, Alle, ...). Im alten System musste nach jeder Änderung eine Bereinigungsroutine alle Daten ab dem betroffenen Zeitpunkt neu berechnen, um wieder Konsistenz herzustellen.
+
+CouchDB trennt Lese- und Schreibzugriffe konsequent und löst so das Dilemma. Dieser Ansatz wird gängigerweise als CQRS bezeichnet. Es gibt ein strikt normalisiertes WriteModel, wovon sich die ReadModels, also die abfragebaren Daten, ableiten. Wichtig ist dabei, dass das WriteModel kein Wissen über die ReadModels hat. In CouchDB ist das über sogenannte Views gelöst. Eine View besteht aus einer map-Funktion die Dokumente einem, keinem oder mehreren Schlüsseln zuordnet. Zusätzlich kann eine weitere reduce-Funktion definiert werden, die die Dokumente mit gleichem Schlüssel aggregiert (also z.B. eine Summe über diese bildet). CouchDB speichert die Zwischenergebnisse seiner Berechnung sehr effizient in einem B-tree ab und kann dadurch die Ergebnisse der View bei jedem Schreibzugriff anpassen. Dieses Feature ist natürlich wie gemacht für die Summierung meiner Haushalts-Ausgaben aus bestimmten Perioden.
+
+Die Views werden in sogenannten Designdokumenten in der Datenbank hinterlegt. Außerdem lässt sich eine Validierungsfunktion definieren. Die Validierungsfunktion wird vor jedem Schreibzugriff ausgeführt und stellt die Konsistenz der Dokumente sicher. Sie kann jedoch nicht Konsistenz über mehrere Dokumente hinweg sicherstellen. Zum Beispiel kann CouchDB nicht sicherstellen, dass eine Referenz auf ein anderes Objekt via dessen ID nicht ins leere greift. Aggregate von Domänenobjekten müssen deshalb immer in einem Dokument gespeichert sein. Das beduetet, man muss bei der Datenmodellierung gut aufpassen, dass man die Aggregate/Dokumente richtig schneidet.
+
+Die Logik der map- und reduce-Funktionen ist dabei in JavaScript definiert. Die Wahl von JavaScript als Abfrage-Sprache ist für das Alter des CouchDB-Projekts wirklich beachtlich. Ein Problem, dass mir dabei immer wieder in die Quere kam, ist, dass die JavaScript-VM, die in CouchDB eingesetzt wird, etwas in die Jahre gekommen ist. Immer wieder haben bestimmte Aufrufe, z.B. auf Arrays, nicht funktioniert, weil die Funktionen nicht vorhanden waren. Generell ist das aber ein überwindbares Hindernis. Ich habe für die Designdokumente sowohl auf Module als auch auf TypeScript verzichtet. Beides ist sicher möglich zu verwenden aber ecklig einzurichten.
+
+Ein Bonus der Designdokumente ist, dass sie auch statische Dateien als Anhänge enthalten können. Diese können auch statisches html enthalten, welches dann über http abgerufen werden kann. Sprich, die Datenbank kann das Frontend zu seiner Anwendung ausliefern. Dadurch wird die ganze Anwendung sozusagen self-contained. Dieser Anwendungsfall ist ausdrücklich so gedacht. Die beiliegende Datenbankverwaltung funktioniert ebenfalls auf diese Weise.
+
+Jenseits von Views, Validierungsfunktion und ein paar anderen Funktionen lässt sich in der Datenbank jedoch keine Logik hinterlegen. Deshalb muss der gesamte Anwendungsfluß im Frontend gesteuert werden. Es bietet sich also an, eine Single-Page-Application einzusetzen. Die API, mit der das Frontend mit der Datenbank kommuniziert, ist vollständig Rest-basiert, d.h. auch hier fällt der Bedarf für eine Middleware (z.B. in nodejs) weg. In Fall des AJExpenditor2 habe ich mich für einen React+MobX-Stack entschieden mit React-Bootstrap als UI-Framework. 
+
+Als Fazit muss ich sagen, dass ich wirklich erstaunt bin, wie gut sich CouchDB für die Entwicklung einer Web-Applikation nach allen aktuell gültigen Regeln der Kunst eignet. CouchDB war einfach zu früh dran und verdient heutzutage weit mehr Beachtung. Vor allem in der heutigen Mirco-Service-Welt wäre CouchDB für viele Anwendungsfälle die richtige Wahl.
