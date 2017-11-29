@@ -45,11 +45,11 @@ const seasonedMix = season(
 return fry(seasonedMix)
 ```
 
-Solange es Konstanten sind - sie also nur einmal zugewiesen werden - lässt sich der eigentliche Ausdrucksbaum durch einsetzen der Werte in das Endergebnis rekonstruieren. Sobald aber eine wiederholte Zuweisung erfolgt, oder eine Funktion aufgerufen wird die den Wert eines Parameter verändert, so wie im ersten Codebeispiel, gilt diese einfach Ersetzbarkeit nichtmehr und der Code lässt sich nichtmehr als ein Ausdruck darstellen. Hieraus ergibt sich der Zusammenhang zwischen funktionaler Programmierung und unveränderlichem Zustand. Sobald veränderlicher Zustand benutzt wird opfert man die Kontrolle über den Datenfluß.
+Solange es Konstanten sind - also Variablen die nur einmal zugewiesen werden - lässt sich der eigentliche Ausdrucksbaum durch einsetzen der Werte in das Endergebnis rekonstruieren. Sobald aber eine wiederholte Zuweisung erfolgt, oder eine Funktion aufgerufen wird die den Wert eines Parameter verändert, so wie `fry(misxture)` im ersten Codebeispiel, gilt diese einfach Ersetzbarkeit nichtmehr und der Code lässt sich nichtmehr als ein Ausdruck darstellen. Hieraus ergibt sich der Zusammenhang zwischen funktionaler Programmierung und unveränderlichem Zustand. Sobald veränderlicher Zustand benutzt wird opfert man die Kontrolle über den Datenfluß.
 
 ### Funktionen höherer Ordnung
 
-Um überhaupt ausschließlich mit Konstanten und ohne Variablen Programme schreiben zu können die echte Probleme lösen benötigt man sogenannte Funktionen höherer Ordnung. Diese sind Funktionen die entweder eine andere Funktion als Parameter nehmen oder eine Funktion als Ergebnis zurück geben. Eines der am häufigsten benutzte Funktion höherer Ordnung ist die Funktion `map` in JavaScript. 
+Um überhaupt ausschließlich mit Konstanten Programme schreiben zu können die echte Probleme lösen benötigt man sogenannte Funktionen höherer Ordnung. Diese sind Funktionen die entweder eine andere Funktion als Parameter nehmen oder eine Funktion als Ergebnis zurück geben. Eines der am häufigsten benutzte Funktion höherer Ordnung ist die Funktion `map` in JavaScript. 
 
 ```javascript
 const arr = [1,2,3];
@@ -57,11 +57,12 @@ const mul = 3;
 arr.map(x => mul*x) // [3,6,9]
 ```
 
-In obigem Beispiel wird ein neues Array erzeugt in dem jedes Element mit 3 mulitpliziert ist. Hier kommen zwei weitere Sprachfeatures zum tragen die die funktionale Programmierung vereinfachen. Zum einen die Funktion die `map` anonym definiert mithilfe eines Pfeilfunktion/Lambda, zum anderen hat diese Funktion Zugriff auf die Konstante mul obwohl sie außerhalb defeniert wurde (genannt Closure). Diese drei Sprachfeatures (Funktionen höhere Ordnung, Lambdas und Closures) ermöglichen zusammen die vielen schönen Fluent-APIs die zeitgemäße Libraries zur Verfügung stellen.
+In obigem Beispiel wird ein neues Array erzeugt in dem jedes Element mit 3 mulitpliziert ist. Hier kommen zwei weitere Sprachfeatures zum tragen die die funktionale Programmierung vereinfachen. Zum einen die Funktion die an `map` as Parameter übergeben wird anonym definiert mithilfe eines Pfeilfunktion/Lambda. Zum anderen hat diese Funktion Zugriff auf die Konstante `mul` obwohl sie außerhalb defeniert wurde (genannt Closure). Diese drei Sprachfeatures (Funktionen höhere Ordnung, Lambdas und Closures) ermöglichen zusammen die vielen ausdruckstarken Fluent-APIs die zeitgemäße Libraries zur Verfügung stellen.
 
 ### Funktional vs rein funktional
 
-Weil Fluent-APIs so beliebt sind haben mittlerweile alle großen Sprachen die funktionalen Features nachgerüstet.
-...
+Weil Fluent-APIs so beliebt sind haben die meistgenutzen Sprachen mittlerweile alle die funktionalen Features nachgerüstet. Die meisten Programmiersprachen kann man also mittlerweile als funktional bezeichnen, weil sie in ihrer Mächtigkeit den _rein_ funktionalen Sprachen in nichts nachstehen. Rein funktionale Sprachen vertreten aber zursätzlich das Prinzip von unveränderlichem Zustand. Sie erlauben entweder garkeine wiederholte Zuweiseung von Variablen, oder nur in bestimmten transaktionsartigen Kontexten. Das heißt rein funktionale Sprachen haben eine absichtlich reduzierte Mächtigkeit, die die Komplexität der Programme begrenzen soll. Dadurch werden die Programme schwerer zu schreiben, aber dafür einfach zu verstehen und zu warten.
+
+Ein anderes Beispiel für eine solche freiwillige beschränkung der Mächtigkeit sind statische Typ-Systeme. Hier wird dem Programm die Möglichkeit genommen, den Typ einer Variable zur Laufzeit zu verändern. Auch hierdurch soll Komplexität eingegrenzt werden.
 
 ### Deklarative Programmierung
