@@ -61,8 +61,27 @@ In obigem Beispiel wird ein neues Array erzeugt in dem jedes Element mit 3 mulit
 
 ### Funktional vs rein funktional
 
-Weil Fluent-APIs so beliebt sind haben die meistgenutzen Sprachen mittlerweile alle die funktionalen Features nachgerüstet. Die meisten Programmiersprachen kann man also mittlerweile als funktional bezeichnen, weil sie in ihrer Mächtigkeit den _rein_ funktionalen Sprachen in nichts nachstehen. Rein funktionale Sprachen vertreten aber zursätzlich das Prinzip von unveränderlichem Zustand. Sie erlauben entweder garkeine wiederholte Zuweiseung von Variablen, oder nur in bestimmten transaktionsartigen Kontexten. Das heißt rein funktionale Sprachen haben eine absichtlich reduzierte Mächtigkeit, die die Komplexität der Programme begrenzen soll. Dadurch werden die Programme schwerer zu schreiben, aber dafür einfach zu verstehen und zu warten.
+Weil Fluent-APIs so beliebt sind haben die meistgenutzen Sprachen mittlerweile alle die funktionalen Features nachgerüstet. Die meisten Programmiersprachen kann man also mittlerweile als funktional bezeichnen, weil sie in ihrer Mächtigkeit den _rein_ funktionalen Sprachen (wie Haskel, Clojure und F#) in nichts nachstehen. Rein funktionale Sprachen vertreten aber zusätzlich das Prinzip von unveränderlichem Zustand. Sie erlauben entweder garkeine wiederholte Zuweiseung von Variablen, oder nur in bestimmten transaktionsartigen Kontexten. Das heißt rein funktionale Sprachen haben eine absichtlich reduzierte Mächtigkeit, die die Komplexität der Programme begrenzen soll. Dadurch werden die Programme schwerer zu schreiben, aber dafür einfach zu verstehen und zu warten.
 
-Ein anderes Beispiel für eine solche freiwillige beschränkung der Mächtigkeit sind statische Typ-Systeme. Hier wird dem Programm die Möglichkeit genommen, den Typ einer Variable zur Laufzeit zu verändern. Auch hierdurch soll Komplexität eingegrenzt werden.
+Ein anderes Beispiel für eine solche freiwillige Beschränkung der Mächtigkeit sind statische Typ-Systeme. Hier wird dem Programm die Möglichkeit genommen, den Typ einer Variable zur Laufzeit zu verändern. Auch hierdurch soll Komplexität eingegrenzt werden.
 
 ### Deklarative Programmierung
+
+Beispiele für FLuent-APIs die in letzter Zeit beliebt geworden sind sind LinQ in .Net, Java-Streams, ReactiveX in der unterschiedlichen Sprachen sowie viele Frameworks für Dependecy-Injection. Ein Grund für ihre Beliebtheit ist das dahinterliegende Pradigma der deklarativen Programmierung, was soviel bedeutet wie die Trennung von Arbeits- und Steuerungscode. Dabei ergibt sich oft, dass sich Arbeitscode weit besser wiederverwenden lässt als Steuerungscode, der ja von der konkreten Geschäftslogik abhängt. Nehmen wir als Beispiel im folgenden die Array-Operation `filter` in JavaScript.
+
+```javascript
+// Ohne Trennung
+let activeUsers = [];
+for (let i = 0; i < users.length; i++) {
+  if(users[i].active){
+    activeUsers.push(users[i])
+  }
+}
+
+// Deklarativ
+const activeUsers = users.filter(x => x.active)
+```
+
+Man sieht sofort, dass die Version mit herausgetrenntem Arbeitscode viel kompakter und einfacher zu lesen ist. Es gebietet schon das DRY-Prinzip (dont repeat yourself), dass `filter` benutzt wird statt überall im Code die selbe For-Schleife auszuprogrammieren.
+
+Kommen wir zum eigentlichen Punkt des Artikels: Bei rein funktionaler Programmierung ergibt sich die Trennung von Arbeits- und Steuerungscode auf natürliche Weise. Dadurch, dass Arbeitscode (wie obiges filter-Beispiel) nur schwer rein funktional auszudrücken ist, ist man hierfür aus die Runtime/Infrastruktur/Frameworks angewiesen.
