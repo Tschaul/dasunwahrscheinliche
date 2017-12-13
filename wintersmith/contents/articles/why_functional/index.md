@@ -1,7 +1,7 @@
 ---
 title: "Warum funktionale Programmierung"
 author: tschaul
-date: 2017-08-31
+date: 2017-12-13
 template: article.jade
 ---
 
