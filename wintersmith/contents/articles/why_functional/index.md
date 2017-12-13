@@ -1,9 +1,9 @@
-<!-- ---
+---
 title: "Warum funktionale Programmierung"
 author: tschaul
 date: 2017-08-31
 template: article.jade
---- -->
+---
 
 Funktionale Programmierung erlebt derzeit in mehreren Breichen eine Renaissance. Sie erlaubt es einfacher deklarativ zu programmieren. So lässt sich die fachliche Steuerungslogik besser von darunter liegenden algorithmischen Arbeitslogik trennen.
 
@@ -31,7 +31,7 @@ return fry(
   )
 )
 ```
-Hierbei geht die Kontrolle über die Abfolge der Befehle etwas verloren. Die als erste ausgewertete Funktion `whisk(eggs)` steht z.B. unscheinbar in der Mitte des Ausdrucks. Dafür lässt sich für jeden Teilausdruck eindeutig zurückverfolgen wo die Werte herkommen, beziehungsweise wie die Daten durch den Ausdruck hindurchfließen. Diese Art der Programmierung gewährleistet also volle Kontrolle über den Datenfluß.
+Hierbei geht die Kontrolle über die Abfolge der Befehle etwas verloren. Die als erste ausgewertete Funktion `whisk(eggs)` steht z.B. unscheinbar in der Mitte des Ausdrucks. In vielen rein funktionalen Sprachen ist es vom Programmcode her oft nicht vorherzusehen zu welchen Zeitpunkt die Auswertung stattfindet, weil sie oft als Optimierung zu spätestmöglichen Zeitpunkt verschoben wird. Auf der anderen Seite lässt sich für jeden Teilausdruck eindeutig zurückverfolgen wo die einzelnen Werte herkommen, beziehungsweise wie die Daten durch den Ausdruck hindurchfließen. Diese Art der Programmierung gewährleistet also volle Kontrolle über den Datenfluß.
 
 Mithilfe der Deklaration von Konstanten lässt sich die Kontrolle über die Abfolge der Aufrufe wieder herstellen. Dadruch wird der Code auch einfacher zu lesen.
 
@@ -82,6 +82,4 @@ for (let i = 0; i < users.length; i++) {
 const activeUsers = users.filter(x => x.active)
 ```
 
-Man sieht sofort, dass die Version mit herausgetrenntem Arbeitscode viel kompakter und einfacher zu lesen ist. Es gebietet schon das DRY-Prinzip (dont repeat yourself), dass `filter` benutzt wird statt überall im Code die selbe For-Schleife auszuprogrammieren.
-
-Kommen wir zum eigentlichen Punkt des Artikels: Bei rein funktionaler Programmierung ergibt sich die Trennung von Arbeits- und Steuerungscode auf natürliche Weise. Dadurch, dass Arbeitscode (wie obiges filter-Beispiel) nur schwer rein funktional auszudrücken ist, ist man hierfür aus die Runtime/Infrastruktur/Frameworks angewiesen.
+Man sieht sofort, dass die Version mit herausgetrenntem Arbeitscode viel kompakter und einfacher zu lesen ist. Es gebietet schon das DRY-Prinzip (dont repeat yourself), dass `filter` benutzt wird statt überall im Code die selbe For-Schleife auszuprogrammieren. Bei rein funktionaler Programmierung ergibt sich also die Trennung von Arbeits- und Steuerungscode auf natürliche Weise. Dadurch, dass Arbeitscode (wie obiges filter-Beispiel) nur schwer rein funktional auszudrücken ist, ist man hierfür aus die Runtime/Infrastruktur/Frameworks angewiesen. So bleibt der eigene Code, der das konkrete Problem der Anwendung löst lesbar und leicht zu verstehen, während die schwierigen wiederkehrenden Probleme outgesourced werden.
