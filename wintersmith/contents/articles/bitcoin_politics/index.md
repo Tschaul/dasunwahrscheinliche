@@ -1,7 +1,7 @@
 ---
 title: "Gewaltenteilung bei Bitcoin"
 author: tschaul
-date: 2017-08-31
+date: 2017-12-17
 template: article.jade
 ---
 
