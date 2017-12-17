@@ -1,5 +1,5 @@
 ---
-title: "Gewaltenteilung"
+title: "Gewaltenteilung bei Bitcoin"
 author: tschaul
 date: 2017-08-31
 template: article.jade

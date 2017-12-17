@@ -5,9 +5,86 @@
     <atom:link href="http://localhost:8080/feed.xml" rel="self" type="application/rss+xml"></atom:link>
     <link>http://localhost:8080</link>
     <description>von Julian Steinwachs</description>
-    <pubDate>Thu, 31  Aug 2017 02:00:00 +0200</pubDate>
+    <pubDate>Wed, 13 Dec 2017 01:00:00 +0100</pubDate>
     <generator>Wintersmith - https://github.com/jnordberg/wintersmith</generator>
     <language>en</language>
+    <item>
+      <title>Warum funktionale Programmierung?</title>
+      <link>http://localhost:8080/articles/why_functional/</link>
+      <pubDate>Wed, 13 Dec 2017 01:00:00 +0100</pubDate>
+      <guid isPermaLink="true">http://localhost:8080/articles/why_functional/</guid>
+      <author></author>
+      <description>&lt;p&gt;Funktionale Programmierung erlebt derzeit in mehreren Breichen eine Aufleben. Sie erlaubt es einfacher deklarativ zu programmieren. So lässt sich die fachliche Steuerungslogik besser von der darunter liegenden algorithmischen Arbeitslogik trennen.&lt;/p&gt;
+&lt;p&gt;&lt;span class=&quot;more&quot;&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;h3 id=&quot;funktional-vs-imperativ&quot;&gt;Funktional vs. Imperativ&lt;/h3&gt;
+&lt;p&gt;Bei der imperativen Programmierung wird Code als Abfolge von Befehlen begriffen, die strikt nacheinandern abgearbeitet werden. Dadurch ist die volle Kontrolle über den Ablauf der Befehle gewährleistet. Gerade für Performance-kritische und Hardware-nahe Programmierung ist der Kontrollfluß und insbesondere die volle Kontrolle über den Arbeitsspeicher essenziell. Als Beispiel zur Demonstration der Konzepte dient im folgenden die Zubereitung eines Rühreis.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;lang-javascript&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;var&lt;/span&gt; mixture = whisk(eggs)
+mixture = season(mixture, salt, pepper)
+fry(mixture)
+&lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; mixture
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Bei der funktionalen Programmierung hingegen wird der Code als Verschachtelung von Ausdrücken betrachtet, die ausgewertet werden sollen. &lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;lang-javascript&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; fry(
+  season(
+    whisk(eggs),
+    salt,  
+    pepper
+  )
+)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Hierbei geht die Kontrolle über die Abfolge der Befehle etwas verloren. Die als erste ausgewertete Funktion &lt;code&gt;whisk(eggs)&lt;/code&gt; steht z.B. unscheinbar in der Mitte des Ausdrucks. In vielen rein funktionalen Sprachen ist es vom Programmcode her oft nicht vorherzusehen zu welchem Zeitpunkt die Auswertung stattfindet, weil die Auswertung zum spätestmöglichen Zeitpunkt verschoben wird. Auf der anderen Seite lässt sich für jeden Teilausdruck eindeutig zurückverfolgen, wo die einzelnen Werte herkommen, beziehungsweise wie die Daten durch den Ausdruck hindurchfließen. Diese Art der Programmierung gewährleistet also volle Kontrolle über den Datenfluß.&lt;/p&gt;
+&lt;p&gt;Mithilfe der Deklaration von Konstanten lässt sich die Kontrolle über die Abfolge der Aufrufe wieder herstellen. Dadruch wird der Code auch einfacher zu lesen.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;lang-javascript&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;const&lt;/span&gt; mixture = whisk(eggs)
+&lt;span class=&quot;keyword&quot;&gt;const&lt;/span&gt; seasonedMix = season(
+    mixture,
+    salt,  
+    pepper
+  )
+&lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; fry(seasonedMix)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Solange es Konstanten sind - also Variablen, die nur einmal zugewiesen werden - lässt sich der eigentliche Ausdrucksbaum durch Einsetzen der Werte in das Endergebnis rekonstruieren. Sobald aber eine wiederholte Zuweisung erfolgt oder eine Funktion aufgerufen wird, die den Wert eines Parameter verändert, so wie &lt;code&gt;fry(mixture)&lt;/code&gt; im ersten Codebeispiel, gilt diese einfache Ersetzbarkeit nicht mehr und der Code lässt sich nicht mehr als ein Ausdruck darstellen. Hieraus ergibt sich der Zusammenhang zwischen funktionaler Programmierung und unveränderlichem Zustand. Sobald veränderliche Zustandsvariablen benutzt werden, opfert man die Kontrolle über den Datenfluß.&lt;/p&gt;
+&lt;h3 id=&quot;funktionen-h-herer-ordnung&quot;&gt;Funktionen höherer Ordnung&lt;/h3&gt;
+&lt;p&gt;Um überhaupt ausschließlich mit Konstanten Programme schreiben zu können, die echte Probleme lösen, benötigt man sogenannte Funktionen höherer Ordnung. Diese sind Funktionen die entweder eine andere Funktion als Parameter annehmen oder eine Funktion als Ergebnis zurückgeben. Eine der am häufigsten benutzten Funktionen höherer Ordnung ist die Funktion &lt;code&gt;map&lt;/code&gt; in JavaScript. &lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;lang-javascript&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;const&lt;/span&gt; arr = [&lt;span class=&quot;number&quot;&gt;1&lt;/span&gt;,&lt;span class=&quot;number&quot;&gt;2&lt;/span&gt;,&lt;span class=&quot;number&quot;&gt;3&lt;/span&gt;];
+&lt;span class=&quot;keyword&quot;&gt;const&lt;/span&gt; mul = &lt;span class=&quot;number&quot;&gt;3&lt;/span&gt;;
+arr.map(&lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;params&quot;&gt;x&lt;/span&gt; =&amp;gt;&lt;/span&gt; mul*x) &lt;span class=&quot;comment&quot;&gt;// [3,6,9]&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In obigem Beispiel wird ein neues Array erzeugt, in dem jedes Element mit 3 multipliziert ist. Hier kommen zwei weitere Sprachfeatures zum Tragen, die die funktionale Programmierung vereinfachen. Zum einen die Funktion, die an &lt;code&gt;map&lt;/code&gt; als Parameter übergeben wird, anonym definiert mithilfe einer Pfeilfunktion (Lambda). Zum anderen hat diese Funktion Zugriff auf die Konstante &lt;code&gt;mul&lt;/code&gt;, obwohl sie außerhalb definiert wurde (genannt Closure). Diese drei Sprachfeatures (Funktionen höherer Ordnung, Lambdas und Closures) ermöglichen zusammen die vielen ausdrucksstarken Fluent-APIs, die zeitgemäße Libraries zur Verfügung stellen.&lt;/p&gt;
+&lt;h3 id=&quot;funktional-vs-rein-funktional&quot;&gt;Funktional vs rein funktional&lt;/h3&gt;
+&lt;p&gt;Weil Fluent-APIs so beliebt sind haben die meistgenutzen Sprachen mittlerweile alle die funktionalen Features nachgerüstet. Die meisten Programmiersprachen kann man also als funktional bezeichnen, weil sie in ihrer Mächtigkeit den &lt;em&gt;rein&lt;/em&gt; funktionalen Sprachen (wie Haskel, Clojure und F#) in nichts nachstehen. Rein funktionale Sprachen verankern aber zusätzlich das Prinzip von unveränderlichem Zustand in sich. Sie erlauben entweder gar keine wiederholte Zuweisung von Variablen oder nur in bestimmten transaktionsartigen Kontexten. Das heißt rein funktionale Sprachen haben eine absichtlich reduzierte Mächtigkeit, die die Komplexität der Programme begrenzen soll. Dadurch werden die Programme schwerer zu schreiben, aber dafür einfach zu verstehen und zu warten.&lt;/p&gt;
+&lt;p&gt;Ein anderes Beispiel für eine solche freiwillige Beschränkung der Mächtigkeit sind statische Typ-Systeme. Hier wird dem Programm die Möglichkeit genommen, den Typ einer Variable zur Laufzeit zu verändern. Auch hierdurch soll Komplexität eingegrenzt werden.&lt;/p&gt;
+&lt;h3 id=&quot;deklarative-programmierung&quot;&gt;Deklarative Programmierung&lt;/h3&gt;
+&lt;p&gt;Beispiele für FLuent-APIs, die in letzter Zeit beliebt geworden sind, sind LinQ in .Net, Java-Streams, ReactiveX sowie viele Frameworks für Dependency-Injection. Ein Grund für ihre Beliebtheit ist das dahinterliegende Paradigma der deklarativen Programmierung, was soviel bedeutet wie die Trennung von Arbeits- und Steuerungscode. Dabei ergibt sich oft, dass sich Arbeitscode weit besser wiederverwenden lässt als Steuerungscode, der ja von der konkreten Geschäftslogik abhängt. Nehmen wir als Beispiel im folgenden die Array-Operation &lt;code&gt;filter&lt;/code&gt; in JavaScript.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;lang-javascript&quot;&gt;&lt;span class=&quot;comment&quot;&gt;// Ohne Trennung&lt;/span&gt;
+&lt;span class=&quot;keyword&quot;&gt;let&lt;/span&gt; activeUsers = [];
+&lt;span class=&quot;keyword&quot;&gt;for&lt;/span&gt; (&lt;span class=&quot;keyword&quot;&gt;let&lt;/span&gt; i = &lt;span class=&quot;number&quot;&gt;0&lt;/span&gt;; i &amp;lt; users.length; i++) {
+  &lt;span class=&quot;keyword&quot;&gt;if&lt;/span&gt;(users[i].active){
+    activeUsers.push(users[i])
+  }
+}
+
+&lt;span class=&quot;comment&quot;&gt;// Deklarativ&lt;/span&gt;
+&lt;span class=&quot;keyword&quot;&gt;const&lt;/span&gt; activeUsers = users.filter(&lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;params&quot;&gt;x&lt;/span&gt; =&amp;gt;&lt;/span&gt; x.active)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Man sieht sofort, dass die Version mit herausgetrenntem Arbeitscode viel kompakter und einfacher zu lesen ist. Es gebietet schon das DRY-Prinzip (don’t repeat yourself), dass &lt;code&gt;filter&lt;/code&gt; benutzt wird statt überall im Code dieselbe For-Schleife auszuprogrammieren. Bei rein funktionaler Programmierung ergibt sich also die Trennung von Arbeits- und Steuerungscode auf natürliche Weise. Dadurch, dass Arbeitscode (wie obiges filter-Beispiel) nur schwer rein funktional auszudrücken ist, ist man hierfür auf die Runtime/Infrastruktur/Frameworks angewiesen. So bleibt der eigene Code, der das konkrete Problem der Anwendung löst, lesbar und leicht zu verstehen, während die schwierigen wiederkehrenden Probleme outgesourced werden.&lt;/p&gt;
+</description>
+    </item>
+    <item>
+      <title>Gewaltenteilung</title>
+      <link>http://localhost:8080/articles/bitcoin_politics/</link>
+      <pubDate>Thu, 31  Aug 2017 02:00:00 +0200</pubDate>
+      <guid isPermaLink="true">http://localhost:8080/articles/bitcoin_politics/</guid>
+      <author></author>
+      <description>&lt;p&gt;Bei Bitcoin gibt es im Wesentlichen drei Gruppen von politischen Akteuren: Nutzer, Miner und Entwickler. Sie alle stehen in gegenseitiger Abhängigkeit. Die Nutzer vertrauen den Entwicklern, dass die Bitcoin-Software sicher ist und messen deshalb der Währung Bitcoin einen Wert zu. Die Entwickler vetrauen wiederum den Minern, dass diese dafür sorgen, die Sicherheit der Blockchain zu gewährleisten. Und die Miner vetrauen darauf, dass die Nutzer der Währung Bitcoin einen Wert beimessen, in der sie bezahlt werden. Der Wert der Währung folgt also aus einem Zirkelschluß, was Bitcoin schon immer einiges an Kritik eingebracht hat. Es ist erstaunlich wie dieses System es schafft, sich an seinen eigenen Schnürsenkeln in immer weitere Höhen zu ziehen.&lt;/p&gt;
+&lt;p&gt;&lt;span class=&quot;more&quot;&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Dadurch, dass sowohl Nutzer, als auch Entwickler und Miner an der Wertschöpfung beteiligt sind, tragen auch alle eine politische Rolle. Es herscht eine Gewaltenteilung vergleichbar mit der in einem Rechtsstaat. Die Entwickler entprechen etwa der Legislative und die Miner etwa der Exekutive. Manch einer würde vielleicht die Miner eher als Judikative sehen. Tatsächlich haben die Miner aber keinerlei Macht über die Auslegung der Regeln, weil jeder Knoten ebenfalls alle Transaktionen automatisiert überprüft. Die Judikative ist also vollständig durch die Software weg-automatisiert (“code is law”).&lt;/p&gt;
+&lt;p&gt;Innerhalb der drei Gruppen gibt es wiederum unterschiedliche Parteien. Bei den Nutzern gibt es sowohl Privatanwender, die die Bitcoin-Software selber betreiben als auch Unternehmen, die Dienste innerhalb der Bitcoin-Plattform zur Verfügung stellen. Die Entwickler lassen sich der jeweiligen Software zuschreiben, für die sie entwickeln. Neben der meistgenutzten Software “bitcoin-core” gibt es mittlerweile auch noch weitere Software-Projekte, die im selben Bitcoin-Netzwerk operieren. Die Miner sind schließlich in unterschiedliche Miningpools aufgeteilt, die um die größte Hashrate konkurrieren.&lt;/p&gt;
+&lt;p&gt;In diesem Jahr (2017) zeigt sich, glaube ich, dass diese Gewaltenteilung bei Bitcoin eine seiner größten Stärken ist. Die Entwickler sind nämlich schon seit Langem uneinig darüber wie Bitcoin zukünftig mit einem größeren Transaktionsaufkommen zurecht kommen soll. Ein den Minern nahestehender Teil will die Größe der Blöcke erhöhen, damit mehr Transaktionen in einen Block passen. Die Entwickler des meistgenutzten Clients “bitcoin-core” (Core-Entwickler) wollen aber stattdessen Technologien ermöglichen, die es erlauben Transaktionen in Zahlungskanälen zu bündeln. &lt;/p&gt;
+&lt;p&gt;Ich will jetzt nicht auf die Unterschiede im Detail eingehen. Viel interessanter ist es sich anzuschauen, wie solche Meinungsverschiedenheiten aufgelöst werden. Nach einem langen Stillstand in der Debatte entschied sich die den Minern nahestehende Fraktion der Entwickler ihre Software inkompatibel zu der der anderen zu machen, um die größeren Blockgrößen zu erlauben. Ein solches Vorgehen wird Hard-Fork genannt. Die Inkompatibilität wurde so einprogrammiert, dass sie erst ab dem 1. August diesen Jahres griff. Ab dem 1. August lag die Blockchain dann in zwei Versionen mit identischen Kontoständen vor, wovon die eine inkompatibel mit dem einen Teil der Software und der andere inkompatibel mit dem anderen Teil der Software waren. Je nachdem welche Software der jeweilige Nutzer einsetzte, operierte er danach auf der einen oder der anderen Version. Die Nutzer hatten jetzt also die Wahl die eine, die andere oder beide Versionen weiterzubenutzen.&lt;/p&gt;
+&lt;p&gt;Die zweite Version mit den veränderten Regeln bekam den namen Bitcoin Cash und wurde an Exchanges gehandelt. Erst dadurch, dass ein Teil der Nutzer Bitcoin Cash einen Wert beigemessen hatte, war es möglich, dass ein Teil der Miner ihre Arbeit auf dessen Blockchain fortführten und sich damit von Bitcoin abwandten. Wäre das nicht passiert, hätten die Miner ihre Belohnung nicht in ihre Lokalwährung umtauschen und damit ihre Stromrechnung bezahlen können.&lt;/p&gt;
+&lt;p&gt;Im Grunde treten die Client-Software-Projekte der Entwickler auf wie politische Parteien, für die die Nutzer abstimmen können. Den Projekten kommt dann die Aufgabe, den Mehrheitswillen der Nutzer möglichst getreu in Software abzubilden. Ansonsten laufen sie Gefahr zu viele Nutzer an Konkurrenz-Projekte zu verlieren. Sobald die Nutzer dem jeweiligen Coin einen zu geringen Wert beimessen, können die Miner ihre Ausgaben nicht mehr begleichen und machen Verlust.&lt;/p&gt;
+</description>
+    </item>
     <item>
       <title>CouchDB: alt aber oho</title>
       <link>http://localhost:8080/articles/couchdb/</link>
