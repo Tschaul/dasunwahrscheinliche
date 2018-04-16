@@ -1,5 +1,5 @@
 ---
-title: "Kryptoönomie - Vorwort"
+title: "Kryptoökonomie - Vorwort"
 author: tschaul
 date: 2018-04-15
 template: article.jade
