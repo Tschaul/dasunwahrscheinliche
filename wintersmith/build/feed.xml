@@ -5,11 +5,19 @@
     <atom:link href="http://localhost:8080/feed.xml" rel="self" type="application/rss+xml"></atom:link>
     <link>http://localhost:8080</link>
     <description>von Julian Steinwachs</description>
-    <pubDate>Sun, 15 Apr 2018 02:00:00 +0200</pubDate>
+    <pubDate>Sun, 22 Apr 2018 02:00:00 +0200</pubDate>
     <generator>Wintersmith - https://github.com/jnordberg/wintersmith</generator>
     <language>en</language>
     <item>
-      <title>Kryptoönomie - Vorwort</title>
+      <title>Kryptoökonomie - Signaturen bei Bitcoin</title>
+      <link>http://localhost:8080/articles/cryptoeconomics_video_002/</link>
+      <pubDate>Sun, 22 Apr 2018 02:00:00 +0200</pubDate>
+      <guid isPermaLink="true">http://localhost:8080/articles/cryptoeconomics_video_002/</guid>
+      <author></author>
+      <description>&lt;div style=&quot;position:relative;height:0;padding-bottom:56.25%&quot;&gt;&lt;iframe src=&quot;https://www.youtube.com/embed/EZA7ffO3bkU?rel=0&quot; width=&quot;640&quot; height=&quot;360&quot; frameborder=&quot;0&quot; allow=&quot;autoplay; encrypted-media&quot; style=&quot;position:absolute;width:100%;height:100%;left:0&quot; allowfullscreen&gt;&lt;/iframe&gt;&lt;/div&gt;</description>
+    </item>
+    <item>
+      <title>Kryptoökonomie - Vorwort</title>
       <link>http://localhost:8080/articles/cryptoeconomics_video_001/</link>
       <pubDate>Sun, 15 Apr 2018 02:00:00 +0200</pubDate>
       <guid isPermaLink="true">http://localhost:8080/articles/cryptoeconomics_video_001/</guid>
