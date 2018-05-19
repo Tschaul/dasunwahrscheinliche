@@ -1,0 +1,27 @@
+
+extends layout
+
+block append vars
+  - bodyclass = 'article-detail'
+
+block prepend title
+  | #{ page.title + ' - '}
+
+block header
+  include author
+  h1= page.title
+  p.author
+    | #{ 'Von ' }
+    mixin author(page.metadata.author)
+
+block content
+  article.article
+    section.content
+        - ytSrc = "https://www.youtube.com/embed/"+page.metadata.videoId+"?rel=0"
+        div(style="position:relative;height:0;padding-bottom:56.25%")
+            iframe(src=ytSrc,width="640",height="360",frameborder="0",allow="autoplay; encrypted-media",style="position:absolute;width:100%;height:100%;left:0",allowfullscreen)
+        
+
+block prepend footer
+  div.nav
+    a(href=contents.index.url) &laquo; Full blog
