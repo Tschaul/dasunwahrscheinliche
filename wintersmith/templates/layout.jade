@@ -22,6 +22,7 @@ html(lang='en')
             h1
               a(href=locals.url)= locals.name
             p.description= locals.description
+            div.info!=locals.info
     div#content
       div.content-wrap
         block content

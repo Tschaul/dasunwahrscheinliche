@@ -103,6 +103,11 @@ hr {
   color: #171717;
 }
 
+.info a:hover {
+  color: #ff8000;
+  text-decoration: underline;
+}
+
 .header .author {
   font-family: 'Merriweather', serif;
   font-variant: small-caps;

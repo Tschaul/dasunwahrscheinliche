@@ -1,9 +1,10 @@
 {
   "locals": {
-    "url": "http://localhost:8080",
+    "url": "http://dasunwahrscheinliche.de",
     "name": "Das Unwahrscheinliche",
     "owner": "Julian Steinwachs",
-    "description": "von Julian Steinwachs"
+    "description": "von Julian Steinwachs",
+    "info": "» <a href=\"https:\/\/www.youtube.com\/channel\/UCV2jwIQ0-Qi1Pn3ETVZSq6Q\"><b>YouTube<b></a>"
   },
   "plugins": [
     "./plugins/paginator.coffee"
