@@ -4,7 +4,7 @@
     "name": "Das Unwahrscheinliche",
     "owner": "Julian Steinwachs",
     "description": "von Julian Steinwachs",
-    "info": "» <a href=\"https:\/\/www.youtube.com\/channel\/UCV2jwIQ0-Qi1Pn3ETVZSq6Q\"><b>YouTube<b></a>"
+    "info": "» <a href=\"https:\/\/www.youtube.com\/channel\/UCV2jwIQ0-Qi1Pn3ETVZSq6Q\"><b>YouTube<b></a><br/>» <a href=\"https:\/\/d.tube\/#!\/c\/tschaul\"><b>DTube<b></a><br/>» <a href=\"https:\/\/www.dailymotion.com\/tschaul\"><b>dailymotion<b></a>"
   },
   "plugins": [
     "./plugins/paginator.coffee"
